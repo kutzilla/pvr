@@ -88,15 +88,105 @@ public class Simulator {
     }
 
     /**
+     * Beschleunigt alle Fahrzeuge auf der Spur
+     */
+    private void fahrzeugeBeschleunigen() {
+        Fahrzeug fahrzeug;
+        for (Spurabschnitt spurabschnitt: this.spur.getSpurabschnitte()) {
+            fahrzeug = spurabschnitt.getFahrzeug();
+            if (fahrzeug != null) {
+                fahrzeug.beschleunigen();
+            }
+        }
+    }
+
+    private void fahrzeugeBremsen() {
+        Fahrzeug fahrzeug;
+        int nachbarFahrzeugIndex;
+        Spurabschnitt spurabschnitte[] = this.spur.getSpurabschnitte();
+        for (int i = 0; i < spurabschnitte.length; i++) {
+            fahrzeug = spurabschnitte[i].getFahrzeug();
+            if (fahrzeug != null) {
+                for (int j = i + 1; j <= i + fahrzeug.getGeschwindigkeit(); j++) {
+                    nachbarFahrzeugIndex = j % spurabschnitte.length;
+                    if (spurabschnitte[nachbarFahrzeugIndex].getFahrzeug() != null) {
+                        // - 1 um vor dem Nachbarfahrzeug stehen zu bleiben
+                        fahrzeug.bremsen(j - i - 1);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    private void fahrzeugeTroedeln() {
+        Random randomGenerator = new Random();
+        Fahrzeug fahrzeug;
+        for (Spurabschnitt spurabschnitt: this.spur.getSpurabschnitte()) {
+            fahrzeug = spurabschnitt.getFahrzeug();
+            if (fahrzeug != null) {
+                double troedeln = ((double) randomGenerator.nextInt(100)) / 100;
+                if (fahrzeug.getGeschwindigkeit() == 1) {
+                    // Zufälliges trödeln
+                    if (troedeln <= p0) {
+                        fahrzeug.troedeln();
+                    }
+                }
+                if (fahrzeug.getGeschwindigkeit() > 1) {
+                    if (troedeln <= p) {
+                        fahrzeug.troedeln();
+                    }
+                }
+            }
+        }
+    }
+
+    public void fahrzeugeFortbewegen() {
+        Fahrzeug fahrzeug;
+        Spurabschnitt spurabschnitte[] = this.spur.getSpurabschnitte();
+        Spur neueSpur = new Spur(spurabschnitte.length);
+        Spurabschnitt neueSpurAbschnitte[] = neueSpur.getSpurabschnitte();
+        for (int i = 0 ; i < spurabschnitte.length; i++) {
+            fahrzeug = spurabschnitte[i].getFahrzeug();
+            if (fahrzeug != null) {
+                //System.out.println("Spring von " + i + " zu " + (i + fahrzeug.getGeschwindigkeit()) % spurabschnitte.length);
+                neueSpurAbschnitte[(i + fahrzeug.getGeschwindigkeit()) % spurabschnitte.length].setFahrzeug(fahrzeug);
+            }
+        }
+        this.spur = neueSpur;
+    }
+
+    /**
      * Simuliert den nächsten Simulationsschritt
      */
     public void simuliere() {
         // TODO Simulation implementieren
+        //System.out.println("Spiefeld zum Zeitpunkt " + k);
+        //spurAusgeben();
+        fahrzeugeBeschleunigen();
+        //System.out.println("Spiefeld nach Beschleunigen");
+        //spurAusgeben();
+        fahrzeugeBremsen();
+        //System.out.println("Spielfeld nach Bremsen");
+        //spurAusgeben();
+        fahrzeugeTroedeln();
+        //System.out.println("Spielfeld nach Troedeln");
+        //spurAusgeben();
+        fahrzeugeFortbewegen();
+        //System.out.println("Spielfeld nach Fortbewegen um Zeitpunkt " + k);
+        spurAusgeben();
+        k++;
     }
 
-    public static void main(String[] args) {
+    public static void clear() {
+        for (int i = 0; i < 54; i++) {
+            System.out.println();
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
         if (args.length == 0) {
-            System.err.println("Es müssen vier Parameter übergeben werden");
+            System.err.println("Es müssen fünf Parameter übergeben werden");
             System.exit(-1);
         }
 
@@ -106,12 +196,19 @@ public class Simulator {
         double p0 = Double.valueOf(args[1]);
         double rho = Double.valueOf(args[2]);
         int n = Integer.valueOf(args[3]);
+        int k = Integer.valueOf(args[4]);
 
         Simulator simulator = new Simulator(p, p0, rho, n);
 
         // Erstellen der Startkonfiguration
         simulator.initialisiere();
         simulator.spurAusgeben();
+        //clear();
+        for (int i = 0; i < k; i++) {
+            simulator.simuliere();
+            clear();
+            Thread.sleep(250);
+        }
     }
 
 

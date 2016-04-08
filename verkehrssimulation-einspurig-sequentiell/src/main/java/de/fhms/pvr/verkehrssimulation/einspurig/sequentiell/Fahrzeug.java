@@ -5,7 +5,7 @@ import java.util.Objects;
 /**
  * Created by Matthias on 08.04.16.
  */
-public class Fahrzeug {
+public class Fahrzeug implements Cloneable {
 
     public static final int MAX_GESCHWINDIGKEIT = 5;
 
@@ -30,17 +30,14 @@ public class Fahrzeug {
         }
     }
 
-    public void bremsen(int delta) {
-        if ((geschwindigkeit - delta) < MIN_GESCHWINDIGKEIT) {
-            geschwindigkeit = 0;
-        } else {
-            geschwindigkeit -= delta;
-        }
+    public void bremsen(int neueGeschwindigkeit) {
+        this.geschwindigkeit = neueGeschwindigkeit;
     }
 
     public void troedeln() {
-        bremsen(1);
+        this.bremsen(geschwindigkeit - 1);
     }
+
 
     @Override
     public boolean equals(Object o) {
@@ -61,4 +58,5 @@ public class Fahrzeug {
                 "geschwindigkeit=" + geschwindigkeit +
                 '}';
     }
+
 }
