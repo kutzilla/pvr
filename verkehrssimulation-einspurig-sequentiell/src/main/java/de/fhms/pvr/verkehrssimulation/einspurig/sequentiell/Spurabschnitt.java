@@ -37,4 +37,11 @@ public class Spurabschnitt {
     public int hashCode() {
         return Objects.hash(fahrzeug);
     }
+
+    @Override
+    public String toString() {
+        return "Spurabschnitt{" +
+                "fahrzeug=" + fahrzeug +
+                '}';
+    }
 }
