@@ -11,6 +11,7 @@
 
     <modules>
         <module>verkehrssimulation-einspurig-sequentiell</module>
+        <module>verkehrssimulation-zweispurig-sequentiell</module>
     </modules>
 
 </project>
