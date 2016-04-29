@@ -12,6 +12,7 @@
     <modules>
         <module>verkehrssimulation-einspurig-sequentiell</module>
         <module>verkehrssimulation-zweispurig-sequentiell</module>
+        <module>verkehrssimulation-mehrspurig-parallel</module>
     </modules>
 
 </project>
