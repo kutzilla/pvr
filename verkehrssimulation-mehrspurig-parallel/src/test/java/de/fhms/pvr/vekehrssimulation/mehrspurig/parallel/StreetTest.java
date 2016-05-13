@@ -8,19 +8,19 @@ import static org.junit.Assert.*;
 /**
  * Created by Matthias on 22.04.16.
  */
-public class SimulatorTest {
+public class StreetTest {
 
-    private Simulator einspurigerSimulator;
+    private Street einspurigerStreet;
 
-    private Simulator zweiSpurigerSimulator;
+    private Street zweiSpurigerStreet;
 
-    private Simulator mehrSpurigerSimulator;
+    private Street mehrSpurigerStreet;
 
     @Before
     public void setUp() {
-        einspurigerSimulator = new Simulator();
-        zweiSpurigerSimulator = new Simulator();
-        mehrSpurigerSimulator = new Simulator();
+        einspurigerStreet = new Street(1, 20, 0.5);
+        zweiSpurigerStreet = new Street(2, 20, 0.5);
+        mehrSpurigerStreet = new Street(3, 20, 0.5);
     }
 
     @Test
