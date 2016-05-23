@@ -28,9 +28,6 @@ public class TrafficSimulator {
 
     protected TrafficSimulator(Vehicle[][] street) {
         this.street = street;
-        this.fastLingerProbability = 0.0;
-        this.slowLingerProbability = 0.0;
-        this.switchProbability = 1.0;
         this.iteration = 0;
         this.randomGenerator = new SplittableRandom();
     }
@@ -194,7 +191,7 @@ public class TrafficSimulator {
             for (int x = 0; x < street[y].length; x++) {
                 if ((tmp = street[y][x]) != null && tmp.getMoveCount() < iteration) {
                     if ((tmpSpeed = tmp.getCurrentSpeed()) > 0) {
-                        tmpIndex = (x + tmp.getCurrentSpeed()) % street[y].length;
+                        tmpIndex = (x + tmpSpeed) % street[y].length;
                         street[y][x] = null;
                         street[y][tmpIndex] = tmp;
                     }
@@ -251,5 +248,25 @@ public class TrafficSimulator {
 
     public long getTotalBreakTime() {
         return totalBreakTime;
+    }
+
+    protected void setIteration(int iteration) {
+        this.iteration = iteration;
+    }
+
+    protected void setStreet(Vehicle[][] street) {
+        this.street = street;
+    }
+
+    protected void setFastLingerProbability(double fastLingerProbability) {
+        this.fastLingerProbability = fastLingerProbability;
+    }
+
+    protected void setSlowLingerProbability(double slowLingerProbability) {
+        this.slowLingerProbability = slowLingerProbability;
+    }
+
+    protected void setSwitchProbability(double switchProbability) {
+        this.switchProbability = switchProbability;
     }
 }
