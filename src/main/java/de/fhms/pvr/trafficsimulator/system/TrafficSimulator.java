@@ -1,137 +1,248 @@
 package de.fhms.pvr.trafficsimulator.system;
 
-import java.util.ArrayList;
+import java.util.SplittableRandom;
 
 public class TrafficSimulator {
 
-    private StreetField streetField;
+    private Vehicle[][] street;
+
+    private SplittableRandom randomGenerator;
 
     private double fastLingerProbability;
 
     private double slowLingerProbability;
 
+    private double switchProbability;
+
     private int iteration;
 
+    private int vehicleCount;
+
+    private long totalBreakTime;
+
+    private long totalAccelerateTime;
+
+    private long totalLinderTime;
+
+    private long totalMoveTime;
+
+    private long totalSimulationTime;
+
     public TrafficSimulator(int trackAmount, int sectionAmount, double vehicleDensity,
-                                double slowLingerProbability, double fastLingerProbability) {
-        this.streetField = new StreetField(trackAmount, sectionAmount, vehicleDensity);
-        this.fastLingerProbability = fastLingerProbability;
+                                double slowLingerProbability, double fastLingerProbability, double switchProbability) {
+        this.street = new Vehicle[trackAmount][sectionAmount];
+        this.randomGenerator = new SplittableRandom();
         this.slowLingerProbability = slowLingerProbability;
+        this.fastLingerProbability = fastLingerProbability;
+        this.switchProbability = switchProbability;
         this.iteration = 0;
-    }
+        this.vehicleCount = (int) ((double) trackAmount * sectionAmount * vehicleDensity);
 
-    public void iterate() {
-        accelerateCarPixels();
-        breakCarPixels();
-        linderCarPixels();
-        moveCarPixelSpeedStates();
-        this.iteration++;
-    }
-
-    private void accelerateCarPixels() {
-        CarPixel[][] carPixels = streetField.getCarPixels();
-        CarPixel currentPixel;
-        int currentPixelSpeedState;
-        for (int i = 0; i < carPixels.length; i++) {
-            for (int j = 0; j < carPixels[i].length; j++) {
-                currentPixel = carPixels[i][j];
-                currentPixelSpeedState = currentPixel.getSpeedState();
-                // Prüft ob sich ein Fahrzeug auf dem Pixel befindet
-                // und bisher nicht die Maximal Geschwindigkeit erreicht hat
-                if (currentPixelSpeedState >= 0 && currentPixelSpeedState < CarPixel.MAX_SPEED) {
-                    // Erhöht die aktuelle Geschwindigkeit um 1
-                    currentPixel.setSpeedState(currentPixelSpeedState + 1);
-                }
-            }
+        int randomTrackIndex, randomSectionIndex;
+        Vehicle tmp;
+        for (int i = 0; i < this.vehicleCount; i++) {
+            tmp = new Vehicle(randomGenerator.nextInt(Vehicle.MAX_SPEED + 1));
+            do {
+                randomTrackIndex = randomGenerator.nextInt(trackAmount);
+                randomSectionIndex = randomGenerator.nextInt(sectionAmount);
+            } while(street[randomTrackIndex][randomSectionIndex] != null);
+            street[randomTrackIndex][randomSectionIndex] = tmp;
         }
     }
 
-    private void breakCarPixels() {
-        CarPixel[][] carPixels = streetField.getCarPixels();
-        CarPixel currentPixel;
-        int currentPixelSpeedState;
-        for (int i = 0; i < carPixels.length; i++) {
-            for (int j = 0; j < carPixels[i].length; j++) {
-                currentPixel = carPixels[i][j];
-                currentPixelSpeedState = currentPixel.getSpeedState();
-                // Prüft ob das aktuelle Fahrzeug bremsen kann
-                if (currentPixelSpeedState > 0) {
-                    int distance = currentPixel.getDistanceToNextRightNeighbour();
-                    // Prüft ob die Distanz zum nächten Fahrzeug positiv ist und kleiner
-                    // als die aktuelle Geschwingkeit ist
-                    if (distance >= 0 && distance < currentPixelSpeedState) {
-                        // Setzt die aktuelle Geschwindigkeit auf die Distanz zum nächsten Fahrzeug
-                        currentPixel.setSpeedState(distance);
+    public void iterate() {
+        long before = System.currentTimeMillis();
+        this.iteration++;
+        if (street[0].length > 1) {
+            switchTrackOfCarPixels();
+        }
+        accelerateCarPixels();
+        breakCarPixels();
+        linderCarPixels();
+        moveCarPixels();
+        totalSimulationTime += System.currentTimeMillis() - before;
+    }
+
+    private void switchTrackOfCarPixels() {
+        Vehicle currentVehicle;
+        int switchTrackIndex, tmpSectionIndex;
+        boolean switchTrack;
+        for (int y = 0; y < street.length; y++) {
+            for (int x = 0; x < street[y].length; x++) {
+                if ((currentVehicle = street[y][x]) != null) {
+                    // Prüfung der Fahrzeuge auf der eigenen Spur
+                    for (int i = 1; i <= currentVehicle.getCurrentSpeed() + 1; i++) {
+                        tmpSectionIndex = (x + i) % street[y].length;
+                        // Blockierendes Fahrzeug befindet sich auf der eignen Spur
+                        if (street[y][tmpSectionIndex] != null) {
+                            // Reset von Wechselspur
+                            switchTrackIndex = -1;
+                            // Prüfung der Spur oberhalb
+                            if (y > 0 && isSwitchToTrackPossible(y - 1, x, currentVehicle.getCurrentSpeed())) {
+                                switchTrackIndex = y - 1;
+                            }
+                            // Prüfung der Spur unterhalb und ein Wechsel
+                            // oberhalb nicht bereits möglich wäre
+                            if (y < street.length - 1 && switchTrackIndex < 0 &&
+                                    isSwitchToTrackPossible(y + 1, x, currentVehicle.getCurrentSpeed())) {
+                                switchTrackIndex = y + 1;
+                            }
+
+                            // Wechsel möglich
+                            if (switchTrackIndex >= 0) {
+                                switchTrack = (((double) randomGenerator.nextInt(100)) / 100) <= switchProbability;
+                                // Ausführung des Wechsels
+                                if (switchTrack) {
+                                    street[y][x] = null;
+                                    street[switchTrackIndex][x] = currentVehicle;
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
+
+    }
+
+    private boolean isSwitchToTrackPossible(int trackIndex, int sectionIndex, int currentSpeed) {
+        int startIndex = sectionIndex - Vehicle.MAX_SPEED;
+        if (startIndex < 0) {
+            startIndex = street[0].length - startIndex - 1;
+        }
+        startIndex = startIndex % street[trackIndex].length;
+        int tmpIndex;
+        for (int x = 1; x <= Vehicle.MAX_SPEED + currentSpeed + 1; x++) {
+            tmpIndex = (startIndex + x) % street[trackIndex].length;
+            if (street[trackIndex][tmpIndex] != null) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void accelerateCarPixels() {
+        long beforeAccelerate = System.currentTimeMillis();
+        Vehicle tmp;
+        for (int y = 0; y < street.length; y++) {
+            for (int x = 0; x < street[y].length; x++) {
+                if ((tmp = street[y][x]) != null) {
+                    tmp.incrementCurrentSpeed();
+                }
+            }
+        }
+        totalAccelerateTime += System.currentTimeMillis() - beforeAccelerate;
+    }
+
+    private void breakCarPixels() {
+        long beforeBreak = System.currentTimeMillis();
+        Vehicle tmp;
+        int tmpSpeed, tmpIndex;
+        for (int y = 0; y < street.length; y++) {
+            for (int x = 0; x < street[y].length; x++) {
+                if ((tmp = street[y][x]) != null) {
+                    tmpSpeed = tmp.getCurrentSpeed();
+                    if (tmpSpeed > 0) {
+                        for (int i = 1; i <= tmp.getCurrentSpeed(); i++) {
+                            tmpIndex = (x + i) % street[y].length;
+                            if (street[y][tmpIndex] != null) {
+                                tmp.setCurrentSpeed(i - 1);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        totalBreakTime += System.currentTimeMillis() - beforeBreak;
     }
 
     private void linderCarPixels() {
-        CarPixel[][] carPixels = streetField.getCarPixels();
-        CarPixel currentPixel;
-        int currentPixelSpeedState;
-        for (int i = 0; i < carPixels.length; i++) {
-            for (int j = 0; j < carPixels[i].length; j++) {
-                currentPixel = carPixels[i][j];
-                currentPixelSpeedState = currentPixel.getSpeedState();
-                // Prüft ob das aktuelle Fahrzeug über eine Geschwindigkeit von 1 verfügt
-                // und bestimmt per Zufall ob es mit der entsprechenden Wahrscheinlichkeit trödelt oder nicht
-                if (currentPixelSpeedState == 1 && TrafficSimulationUtil.isCarPixelLindering(slowLingerProbability)) {
-                    currentPixel.setSpeedState(currentPixelSpeedState - 1);
-                }
-                // Prüft ob das aktuelle Fahrzeug über eine Geschwindigkeit von mehr als 1 verfügt
-                // und bestimmt per Zufall ob es mit der entsprechenden Wahrscheinlichkeit trödelt oder nicht
-                if (currentPixelSpeedState > 1 && TrafficSimulationUtil.isCarPixelLindering(fastLingerProbability)) {
-                    currentPixel.setSpeedState(currentPixelSpeedState - 1);
+        long beforeLinder = System.currentTimeMillis();
+        boolean linders;
+        int tmpCurrentSpeed;
+        Vehicle tmp;
+        for (int y = 0; y < street.length; y++) {
+            for (int x = 0; x < street[y].length; x++) {
+                if ((tmp = street[y][x]) != null && (tmpCurrentSpeed = tmp.getCurrentSpeed()) > 0) {
+                    if (tmpCurrentSpeed > 1) {
+                        linders = (((double) randomGenerator.nextInt(100)) / 100) <= fastLingerProbability;
+                    } else {
+                        linders = (((double) randomGenerator.nextInt(100)) / 100) <= slowLingerProbability;
+                    }
+                    if (linders) {
+                        tmp.decrementCurrentSpeed();
+                    }
                 }
             }
         }
+        totalLinderTime += System.currentTimeMillis() - beforeLinder;
     }
 
-    private void moveCarPixelSpeedStates() {
-        CarPixel[][] carPixels = streetField.getCarPixels();
-        CarPixel currentPixel;
-        int currentPixelSpeedState;
-        CarPixel switchingCarPixel;
-        ArrayList<CarPixel.SpeedMovement> moves = new ArrayList<CarPixel.SpeedMovement>();
-        for (int i = 0; i < carPixels.length; i++) {
-            for (int j = 0; j < carPixels[i].length; j++) {
-                currentPixel = carPixels[i][j];
-                currentPixelSpeedState = currentPixel.getSpeedState();
-                if (currentPixelSpeedState > 0) {
-                    switchingCarPixel = currentPixel.getRightNeighbours()[currentPixelSpeedState - 1];
-                    moves.add(new CarPixel.SpeedMovement(currentPixel, switchingCarPixel));
+    private void moveCarPixels() {
+        long beforeMove = System.currentTimeMillis();
+        Vehicle tmp;
+        int tmpIndex, tmpSpeed;
+        for (int y = 0; y < street.length; y++) {
+            for (int x = 0; x < street[y].length; x++) {
+                if ((tmp = street[y][x]) != null && tmp.getMoveCount() < iteration) {
+                    if ((tmpSpeed = tmp.getCurrentSpeed()) > 0) {
+                        tmpIndex = (x + tmp.getCurrentSpeed()) % street[y].length;
+                        street[y][x] = null;
+                        street[y][tmpIndex] = tmp;
+                    }
+                    tmp.incrementMoveCount();
                 }
             }
         }
-        for (CarPixel.SpeedMovement sm: moves) {
-            sm.move();
-        }
+        totalMoveTime += System.currentTimeMillis() - beforeMove;
     }
 
     public void printStreetField() {
-        CarPixel[][] carPixels = this.streetField.getCarPixels();
-        CarPixel tmp;
-        for (int i = 0; i < carPixels.length; i++) {
-            for (int j = 0; j < carPixels[i].length; j++) {
-                tmp = carPixels[i][j];
-                if (tmp.getSpeedState() >= 0) {
-                    System.out.print("[" + carPixels[i][j].getSpeedState() + "] ");
+        Vehicle tmp;
+        for (int i = 0; i < street[0].length; i++) {
+            System.out.print("|" + (i % 10) + "| ");
+        }
+        System.out.println("\r\n");
+        for (int i = 0; i < street.length; i++) {
+            for (int j = 0; j < street[i].length; j++) {
+                tmp = street[i][j];
+                if (tmp != null && tmp.getCurrentSpeed() >= 0) {
+                    System.out.print("[" + tmp.getCurrentSpeed() + "] ");
                 } else {
                     System.out.print("[ ] ");
                 }
             }
             System.out.println();
         }
+        System.out.println();
     }
 
-    public StreetField getStreetField() {
-        return streetField;
+    public Vehicle[][] getStreet() {
+        return street;
     }
 
     public int getIteration() {
         return iteration;
+    }
+
+    public long getTotalSimulationTime() {
+        return totalSimulationTime;
+    }
+
+    public long getTotalMoveTime() {
+        return totalMoveTime;
+    }
+
+    public long getTotalLinderTime() {
+        return totalLinderTime;
+    }
+
+    public long getTotalAccelerateTime() {
+        return totalAccelerateTime;
+    }
+
+    public long getTotalBreakTime() {
+        return totalBreakTime;
     }
 }
