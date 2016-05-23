@@ -16,8 +16,6 @@ public class TrafficSimulator {
 
     private int iteration;
 
-    private int vehicleCount;
-
     private long totalBreakTime;
 
     private long totalAccelerateTime;
@@ -28,6 +26,15 @@ public class TrafficSimulator {
 
     private long totalSimulationTime;
 
+    protected TrafficSimulator(Vehicle[][] street) {
+        this.street = street;
+        this.fastLingerProbability = 0.0;
+        this.slowLingerProbability = 0.0;
+        this.switchProbability = 1.0;
+        this.iteration = 0;
+        this.randomGenerator = new SplittableRandom();
+    }
+
     public TrafficSimulator(int trackAmount, int sectionAmount, double vehicleDensity,
                                 double slowLingerProbability, double fastLingerProbability, double switchProbability) {
         this.street = new Vehicle[trackAmount][sectionAmount];
@@ -36,11 +43,11 @@ public class TrafficSimulator {
         this.fastLingerProbability = fastLingerProbability;
         this.switchProbability = switchProbability;
         this.iteration = 0;
-        this.vehicleCount = (int) ((double) trackAmount * sectionAmount * vehicleDensity);
+        int vehicleCount = (int) ((double) trackAmount * sectionAmount * vehicleDensity);
 
         int randomTrackIndex, randomSectionIndex;
         Vehicle tmp;
-        for (int i = 0; i < this.vehicleCount; i++) {
+        for (int i = 0; i < vehicleCount; i++) {
             tmp = new Vehicle(randomGenerator.nextInt(Vehicle.MAX_SPEED + 1));
             do {
                 randomTrackIndex = randomGenerator.nextInt(trackAmount);
@@ -63,7 +70,7 @@ public class TrafficSimulator {
         totalSimulationTime += System.currentTimeMillis() - before;
     }
 
-    private void switchTrackOfCarPixels() {
+    protected void switchTrackOfCarPixels() {
         Vehicle currentVehicle;
         int switchTrackIndex, tmpSectionIndex;
         boolean switchTrack;
@@ -121,7 +128,7 @@ public class TrafficSimulator {
         return true;
     }
 
-    private void accelerateCarPixels() {
+    protected void accelerateCarPixels() {
         long beforeAccelerate = System.currentTimeMillis();
         Vehicle tmp;
         for (int y = 0; y < street.length; y++) {
@@ -134,7 +141,7 @@ public class TrafficSimulator {
         totalAccelerateTime += System.currentTimeMillis() - beforeAccelerate;
     }
 
-    private void breakCarPixels() {
+    protected void breakCarPixels() {
         long beforeBreak = System.currentTimeMillis();
         Vehicle tmp;
         int tmpSpeed, tmpIndex;
@@ -157,7 +164,7 @@ public class TrafficSimulator {
         totalBreakTime += System.currentTimeMillis() - beforeBreak;
     }
 
-    private void linderCarPixels() {
+    protected void linderCarPixels() {
         long beforeLinder = System.currentTimeMillis();
         boolean linders;
         int tmpCurrentSpeed;
@@ -179,7 +186,7 @@ public class TrafficSimulator {
         totalLinderTime += System.currentTimeMillis() - beforeLinder;
     }
 
-    private void moveCarPixels() {
+    protected void moveCarPixels() {
         long beforeMove = System.currentTimeMillis();
         Vehicle tmp;
         int tmpIndex, tmpSpeed;

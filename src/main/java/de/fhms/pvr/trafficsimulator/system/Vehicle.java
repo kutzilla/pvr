@@ -1,5 +1,7 @@
 package de.fhms.pvr.trafficsimulator.system;
 
+import java.util.Objects;
+
 public class Vehicle {
 
     public static final int MAX_SPEED = 5;
@@ -47,5 +49,19 @@ public class Vehicle {
                 "currentSpeed=" + currentSpeed +
                 ", moveCount=" + moveCount +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Vehicle vehicle = (Vehicle) o;
+        return currentSpeed == vehicle.currentSpeed &&
+                moveCount == vehicle.moveCount;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(currentSpeed, moveCount);
     }
 }
