@@ -1,6 +1,5 @@
 package de.fhms.pvr.trafficsimulator.system;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -14,7 +13,7 @@ public class TrafficSimulatorTest {
     private TrafficSimulator trafficSimulator;
 
     @Test
-    public void testAccelerateCarPixels() {
+    public void testSimulateAcceleration() {
         testStreet = new Vehicle[1][10];
         testStreet[0][0] = new Vehicle(4);
         testStreet[0][5] = new Vehicle(2);
@@ -26,12 +25,12 @@ public class TrafficSimulatorTest {
         expectedStreet[0][9] = new Vehicle(5);
 
         trafficSimulator = new TrafficSimulator(testStreet);
-        trafficSimulator.accelerateCarPixels();
+        trafficSimulator.simulateAcceleration();
         assertArrayEquals(expectedStreet, trafficSimulator.getStreet());
     }
 
     @Test
-    public void testBreakCarPixels() {
+    public void testSimulateDeceleration() {
         testStreet = new Vehicle[1][10];
         testStreet[0][0] = new Vehicle(5);
         testStreet[0][1] = new Vehicle(2);
@@ -45,12 +44,12 @@ public class TrafficSimulatorTest {
         expectedStreet[0][8] = new Vehicle(1);
 
         trafficSimulator = new TrafficSimulator(testStreet);
-        trafficSimulator.breakCarPixels();
+        trafficSimulator.simulateDeceleration();
         assertArrayEquals(expectedStreet, trafficSimulator.getStreet());
     }
 
     @Test
-    public void testSlowLinderCarPixels() {
+    public void testSimulateSlowDawdling() {
         testStreet = new Vehicle[1][10];
         testStreet[0][0] = new Vehicle(1);
         testStreet[0][4] = new Vehicle(5);
@@ -62,13 +61,13 @@ public class TrafficSimulatorTest {
         expectedStreet[0][7] = new Vehicle(2);
 
         trafficSimulator = new TrafficSimulator(testStreet);
-        trafficSimulator.setSlowLingerProbability(1.0);
-        trafficSimulator.linderCarPixels();
+        trafficSimulator.setSlowDawdleProbability(1.0);
+        trafficSimulator.simulateDawdling();
         assertArrayEquals(expectedStreet, trafficSimulator.getStreet());
     }
 
     @Test
-    public void testFastLinderCarPixels() {
+    public void testFastDawdling() {
         testStreet = new Vehicle[1][10];
         testStreet[0][0] = new Vehicle(1);
         testStreet[0][4] = new Vehicle(5);
@@ -80,13 +79,13 @@ public class TrafficSimulatorTest {
         expectedStreet[0][7] = new Vehicle(1);
 
         trafficSimulator = new TrafficSimulator(testStreet);
-        trafficSimulator.setFastLingerProbability(1.0);
-        trafficSimulator.linderCarPixels();
+        trafficSimulator.setFastDawdleProbability(1.0);
+        trafficSimulator.simulateDawdling();
         assertArrayEquals(expectedStreet, trafficSimulator.getStreet());
     }
 
     @Test
-    public void testMoveCarPixels() {
+    public void testSimulateMovement() {
         testStreet = new Vehicle[1][10];
         testStreet[0][0] = new Vehicle(3);
         testStreet[0][4] = new Vehicle(2);
@@ -101,12 +100,12 @@ public class TrafficSimulatorTest {
 
         trafficSimulator = new TrafficSimulator(testStreet);
         trafficSimulator.setIteration(1);
-        trafficSimulator.moveCarPixels();
+        trafficSimulator.simulateMovement();
         assertArrayEquals(expectedStreet, trafficSimulator.getStreet());
     }
 
     @Test
-    public void testSwitchTrackOfCarPixelsIsPosible() {
+    public void testSimulateTrackSwitchingIsPossible() {
         testStreet = new Vehicle[2][20];
         testStreet[0][5] = new Vehicle(5);
         testStreet[0][11] = new Vehicle(3);
@@ -118,12 +117,12 @@ public class TrafficSimulatorTest {
 
         trafficSimulator = new TrafficSimulator(testStreet);
         trafficSimulator.setSwitchProbability(1.0);
-        trafficSimulator.switchTrackOfCarPixels();
+        trafficSimulator.simulateTrackSwitching();
         assertArrayEquals(expectedStreet, trafficSimulator.getStreet());
     }
 
     @Test
-    public void testSwitchTrackOfCarPixelsIsNotPosibleInBack() {
+    public void testSimulateTrackSwitchingIsNotPossibleInBack() {
         testStreet = new Vehicle[2][20];
         testStreet[0][5] = new Vehicle(5);
         testStreet[0][8] = new Vehicle(3);
@@ -136,12 +135,12 @@ public class TrafficSimulatorTest {
 
         trafficSimulator = new TrafficSimulator(testStreet);
         trafficSimulator.setSwitchProbability(1.0);
-        trafficSimulator.switchTrackOfCarPixels();
+        trafficSimulator.simulateTrackSwitching();
         assertArrayEquals(expectedStreet, trafficSimulator.getStreet());
     }
 
     @Test
-    public void testSwitchTrackOfCarPixelsIsNotPosibleInFront() {
+    public void testSimulateTrackSwitchingIsNotPossibleInFront() {
         testStreet = new Vehicle[2][20];
         testStreet[0][5] = new Vehicle(5);
         testStreet[0][8] = new Vehicle(3);
@@ -154,12 +153,12 @@ public class TrafficSimulatorTest {
 
         trafficSimulator = new TrafficSimulator(testStreet);
         trafficSimulator.setSwitchProbability(1.0);
-        trafficSimulator.switchTrackOfCarPixels();
+        trafficSimulator.simulateTrackSwitching();
         assertArrayEquals(expectedStreet, trafficSimulator.getStreet());
     }
 
     @Test
-    public void testSwitchTrackWithThreeTracks() {
+    public void testSimulateTrackSwitchingIsPossibleWithThreeTracks() {
         testStreet = new Vehicle[3][20];
         testStreet[2][2] = new Vehicle(5);
         testStreet[2][5] = new Vehicle(3);
@@ -172,7 +171,7 @@ public class TrafficSimulatorTest {
 
         trafficSimulator = new TrafficSimulator(testStreet);
         trafficSimulator.setSwitchProbability(1.0);
-        trafficSimulator.switchTrackOfCarPixels();
+        trafficSimulator.simulateTrackSwitching();
         assertArrayEquals(expectedStreet, trafficSimulator.getStreet());
     }
 

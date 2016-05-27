@@ -8,9 +8,9 @@ public class TrafficSimulator {
 
     private SplittableRandom randomGenerator;
 
-    private double fastLingerProbability;
+    private double fastDawdleProbability;
 
-    private double slowLingerProbability;
+    private double slowDawdleProbability;
 
     private double switchProbability;
 
@@ -33,11 +33,11 @@ public class TrafficSimulator {
     }
 
     public TrafficSimulator(int trackAmount, int sectionAmount, double vehicleDensity,
-                                double slowLingerProbability, double fastLingerProbability, double switchProbability) {
+                            double slowDawdleProbability, double fastDawdleProbability, double switchProbability) {
         this.street = new Vehicle[trackAmount][sectionAmount];
         this.randomGenerator = new SplittableRandom();
-        this.slowLingerProbability = slowLingerProbability;
-        this.fastLingerProbability = fastLingerProbability;
+        this.slowDawdleProbability = slowDawdleProbability;
+        this.fastDawdleProbability = fastDawdleProbability;
         this.switchProbability = switchProbability;
         this.iteration = 0;
         int vehicleCount = (int) ((double) trackAmount * sectionAmount * vehicleDensity);
@@ -58,16 +58,16 @@ public class TrafficSimulator {
         long before = System.currentTimeMillis();
         this.iteration++;
         if (street[0].length > 1) {
-            switchTrackOfCarPixels();
+            simulateTrackSwitching();
         }
-        accelerateCarPixels();
-        breakCarPixels();
-        linderCarPixels();
-        moveCarPixels();
+        simulateAcceleration();
+        simulateDeceleration();
+        simulateDawdling();
+        simulateMovement();
         totalSimulationTime += System.currentTimeMillis() - before;
     }
 
-    protected void switchTrackOfCarPixels() {
+    protected void simulateTrackSwitching() {
         Vehicle currentVehicle;
         int switchTrackIndex, tmpSectionIndex;
         boolean switchTrack;
@@ -125,7 +125,7 @@ public class TrafficSimulator {
         return true;
     }
 
-    protected void accelerateCarPixels() {
+    protected void simulateAcceleration() {
         long beforeAccelerate = System.currentTimeMillis();
         Vehicle tmp;
         for (int y = 0; y < street.length; y++) {
@@ -138,7 +138,7 @@ public class TrafficSimulator {
         totalAccelerateTime += System.currentTimeMillis() - beforeAccelerate;
     }
 
-    protected void breakCarPixels() {
+    protected void simulateDeceleration() {
         long beforeBreak = System.currentTimeMillis();
         Vehicle tmp;
         int tmpSpeed, tmpIndex;
@@ -161,7 +161,7 @@ public class TrafficSimulator {
         totalBreakTime += System.currentTimeMillis() - beforeBreak;
     }
 
-    protected void linderCarPixels() {
+    protected void simulateDawdling() {
         long beforeLinder = System.currentTimeMillis();
         boolean linders;
         int tmpCurrentSpeed;
@@ -170,9 +170,9 @@ public class TrafficSimulator {
             for (int x = 0; x < street[y].length; x++) {
                 if ((tmp = street[y][x]) != null && (tmpCurrentSpeed = tmp.getCurrentSpeed()) > 0) {
                     if (tmpCurrentSpeed > 1) {
-                        linders = (((double) randomGenerator.nextInt(100)) / 100) <= fastLingerProbability;
+                        linders = (((double) randomGenerator.nextInt(100)) / 100) <= fastDawdleProbability;
                     } else {
-                        linders = (((double) randomGenerator.nextInt(100)) / 100) <= slowLingerProbability;
+                        linders = (((double) randomGenerator.nextInt(100)) / 100) <= slowDawdleProbability;
                     }
                     if (linders) {
                         tmp.decrementCurrentSpeed();
@@ -183,7 +183,7 @@ public class TrafficSimulator {
         totalLinderTime += System.currentTimeMillis() - beforeLinder;
     }
 
-    protected void moveCarPixels() {
+    protected void simulateMovement() {
         long beforeMove = System.currentTimeMillis();
         Vehicle tmp;
         int tmpIndex, tmpSpeed;
@@ -258,12 +258,12 @@ public class TrafficSimulator {
         this.street = street;
     }
 
-    protected void setFastLingerProbability(double fastLingerProbability) {
-        this.fastLingerProbability = fastLingerProbability;
+    protected void setFastDawdleProbability(double fastDawdleProbability) {
+        this.fastDawdleProbability = fastDawdleProbability;
     }
 
-    protected void setSlowLingerProbability(double slowLingerProbability) {
-        this.slowLingerProbability = slowLingerProbability;
+    protected void setSlowDawdleProbability(double slowDawdleProbability) {
+        this.slowDawdleProbability = slowDawdleProbability;
     }
 
     protected void setSwitchProbability(double switchProbability) {
