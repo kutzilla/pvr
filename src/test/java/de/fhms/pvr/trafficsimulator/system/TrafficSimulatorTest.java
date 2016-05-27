@@ -158,6 +158,23 @@ public class TrafficSimulatorTest {
         assertArrayEquals(expectedStreet, trafficSimulator.getStreet());
     }
 
+    @Test
+    public void testSwitchTrackWithThreeTracks() {
+        testStreet = new Vehicle[3][20];
+        testStreet[2][2] = new Vehicle(5);
+        testStreet[2][5] = new Vehicle(3);
+        testStreet[0][5] = new Vehicle(1);
+
+        expectedStreet = new Vehicle[3][20];
+        expectedStreet[1][2] = new Vehicle(5);
+        expectedStreet[2][5] = new Vehicle(3);
+        expectedStreet[0][5] = new Vehicle(1);
+
+        trafficSimulator = new TrafficSimulator(testStreet);
+        trafficSimulator.setSwitchProbability(1.0);
+        trafficSimulator.switchTrackOfCarPixels();
+        assertArrayEquals(expectedStreet, trafficSimulator.getStreet());
+    }
 
 
 }
