@@ -1,14 +1,15 @@
 package de.fhms.pvr.trafficsimulator;
 
 
-import de.fhms.pvr.trafficsimulator.system.TrafficSimulator;
 import de.fhms.pvr.trafficsimulator.system.Vehicle;
 
 import static org.fusesource.jansi.Ansi.ansi;
 
 public class Main {
 
+    /** TODO mit GUI migrieren
     public static void main(String[] args) {
+
         int trackAmount = 6;
         int sectionAmount = 29507;
         double p0 = 0.2;
@@ -27,8 +28,8 @@ public class Main {
         System.out.println("Trödeln:\t\t" + trafficSimulator.getTotalLinderTime() + "ms");
         System.out.println("Fortbewegen:\t" + trafficSimulator.getTotalMoveTime() + "ms");
         System.out.println("\r\nGesamt:\t\t\t" + trafficSimulator.getTotalSimulationTime() + "ms");
-    }
-
+         }
+**/
     private static void printField(Vehicle[][] field) {
         String symbol = "▩";
         Vehicle tmp;
