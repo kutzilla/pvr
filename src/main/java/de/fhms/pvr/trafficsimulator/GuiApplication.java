@@ -16,6 +16,7 @@ public class GuiApplication extends Application {
         Parent root = FXMLLoader.load(getClass().getResource("/view/traffic_simulation.fxml"));
         primaryStage.setTitle("Verkehrssimulation");
         primaryStage.setScene(new Scene(root, 800, 600));
+        System.out.println("##################### Initialisiere GUI #####################");
         primaryStage.show();
     }
 

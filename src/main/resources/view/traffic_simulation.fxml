@@ -5,24 +5,70 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<TabPane id="tabPane" fx:id="tabPaneRoot" prefHeight="600.0" prefWidth="800.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.fhms.pvr.trafficsimulator.gui.ViewController">
-  <tabs>
-    <Tab fx:id="tabSimulation" text="Simulation">
-      <content>
-        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="171.0" prefWidth="473.0">
-               <children>
-                  <Canvas fx:id="canvasStreetLayer" height="100.0" layoutY="457.0" width="800.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="457.0" />
-                  <Button id="btnStart" layoutX="14.0" layoutY="38.0" mnemonicParsing="false" onAction="#start" text="Start" />
-                  <Button layoutX="69.0" layoutY="38.0" mnemonicParsing="false" onAction="#stop" text="Stop" />
-                  <Canvas fx:id="canvasCarLayer" height="100.0" layoutY="457.0" width="800.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="457.0" />
-               </children>
-        </AnchorPane>
-      </content>
-    </Tab>
-    <Tab fx:id="tabAnalysis" text="Analyse">
-      <content>
-        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-      </content>
-    </Tab>
-  </tabs>
-</TabPane>
+<AnchorPane prefHeight="150.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.fhms.pvr.trafficsimulator.gui.ViewController">
+   <children>
+      <TabPane id="tabPane" fx:id="tabPaneRoot" layoutY="28.0" prefHeight="600.0" prefWidth="800.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
+        <tabs>
+            <Tab text="Config">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <TextField fx:id="txtTracks" layoutX="155.0" layoutY="64.0" prefHeight="25.0" prefWidth="60.0" />
+                        <TextField fx:id="txtIterations" layoutX="155.0" layoutY="98.0" prefHeight="25.0" prefWidth="60.0" />
+                        <TextField fx:id="txtSectionAmount" layoutX="155.0" layoutY="131.0" prefHeight="25.0" prefWidth="60.0" />
+                        <TextField fx:id="txtP" layoutX="155.0" layoutY="165.0" prefHeight="25.0" prefWidth="60.0" />
+                        <TextField fx:id="txtP0" layoutX="155.0" layoutY="202.0" prefHeight="25.0" prefWidth="60.0" />
+                        <TextField fx:id="txtRho" layoutX="155.0" layoutY="239.0" prefHeight="25.0" prefWidth="60.0" />
+                        <TextField fx:id="txtSwitchProb" layoutX="155.0" layoutY="276.0" prefHeight="25.0" prefWidth="60.0" />
+                        <Label layoutX="84.0" layoutY="27.0" text="Config" />
+                        <Label layoutX="14.0" layoutY="68.0" text="Anz. Spuren:" />
+                        <Label layoutX="14.0" layoutY="102.0" text="Anz. Iterationen:" />
+                        <Label layoutX="13.0" layoutY="169.0" text="p (Trödelwahrschein.):" />
+                        <Label layoutX="13.0" layoutY="206.0" text="p0 (Trödwahrsch Stau):" />
+                        <Label layoutX="13.0" layoutY="243.0" text="Fahrzeugdichte:" />
+                        <Label layoutX="13.0" layoutY="280.0" text="Spurwechselwahrsch.:" />
+                        <Label layoutX="14.0" layoutY="135.0" text="Anz. Spurenabschnitte:" />
+                     </children>
+                  </AnchorPane>
+              </content>
+            </Tab>
+          <Tab fx:id="tabSimulation" text="Simulation">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="171.0" prefWidth="473.0">
+                     <children>
+                        <Canvas fx:id="canvasStreetLayer" height="100.0" layoutY="457.0" width="800.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="457.0" />
+                        <Button id="btnStart" layoutX="14.0" layoutY="38.0" mnemonicParsing="false" onAction="#startSimulation" text="Start" />
+                        <Button layoutX="69.0" layoutY="38.0" mnemonicParsing="false" onAction="#stopSimulation" text="Stop" />
+                        <Canvas fx:id="canvasCarLayer" height="100.0" layoutY="457.0" width="800.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="457.0" />
+                     </children>
+              </AnchorPane>
+            </content>
+          </Tab>
+          <Tab fx:id="tabAnalysis" text="Analyse">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+            </content>
+          </Tab>
+        </tabs>
+      </TabPane>
+      <MenuBar layoutY="-12.0" AnchorPane.bottomAnchor="600.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Close" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Edit">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Delete" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+   </children>
+</AnchorPane>

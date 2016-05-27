@@ -1,6 +1,8 @@
 package de.fhms.pvr.trafficsimulator.gui;
 
 
+import de.fhms.pvr.trafficsimulator.Main;
+import de.fhms.pvr.trafficsimulator.system.TrafficSimulator;
 import javafx.animation.AnimationTimer;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -9,7 +11,10 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
+
+import static org.fusesource.jansi.Ansi.ansi;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -20,7 +25,6 @@ import java.util.ResourceBundle;
  * @author Dave
  */
 public class ViewController implements Initializable {
-
 
     private final double LINE_WIDTH =2.0;
     private final double CAR_WIDTH = 60;
@@ -43,12 +47,72 @@ public class ViewController implements Initializable {
     @FXML
     Canvas canvasCarLayer;
 
-    public void start(Event event){
-        drawStreet(canvasStreetLayer.getGraphicsContext2D());
-        startCars(canvasCarLayer.getGraphicsContext2D());
+    @FXML
+    TextField txtTracks;
+
+    @FXML
+    TextField txtIterations;
+
+    @FXML
+    TextField txtP;
+
+    @FXML
+    TextField txtP0;
+
+    @FXML
+    TextField txtRho;
+
+    @FXML
+    TextField txtSwitchProb;
+
+    @FXML
+    TextField txtSectionAmount;
+
+
+    public void startSimulation(Event event){
+        if(validateInput()){
+            int trackAmount = Integer.parseInt(txtTracks.getText());
+            int sectionAmount = Integer.parseInt(txtSectionAmount.getText());
+            double p0  = Double.parseDouble(txtP0.getText());
+            double p = Double.parseDouble(txtP.getText());
+            double rho  = Double.parseDouble(txtRho.getText());
+            double c =  Double.parseDouble(txtSwitchProb.getText());
+            int iterations = Integer.parseInt(txtIterations.getText());
+
+            TrafficSimulator trafficSimulator = new TrafficSimulator(trackAmount, sectionAmount, rho, p0, p, c);
+
+            for (int i = 0; i < iterations; i++) {
+                trafficSimulator.iterate();
+                //Main.printField(trafficSimulator.getStreet());
+            }
+
+            System.out.println(ansi().reset());
+            System.out.println("Beschleunigen:\t" + trafficSimulator.getTotalAccelerateTime() + "ms");
+            System.out.println("Bremsen:\t\t" + trafficSimulator.getTotalBreakTime() + "ms");
+            System.out.println("Trödeln:\t\t" + trafficSimulator.getTotalLinderTime() + "ms");
+            System.out.println("Fortbewegen:\t" + trafficSimulator.getTotalMoveTime() + "ms");
+            System.out.println("\r\nGesamt:\t\t\t" + trafficSimulator.getTotalSimulationTime() + "ms");
+
+        }
+
+        //drawStreet(canvasStreetLayer.getGraphicsContext2D());
+        //startCars(canvasCarLayer.getGraphicsContext2D());
     }
 
-    public void stop(Event event){
+    private boolean validateInput() {
+        if(isNumeric(txtTracks.getText())
+                && isNumeric(txtIterations.getText())
+                && isNumeric(txtP.getText())
+                && isNumeric(txtP0.getText())
+                && isNumeric(txtRho.getText())
+                && isNumeric(txtSwitchProb.getText())
+                && isNumeric(txtSectionAmount.getText())){
+            return true;
+        }
+        return false;
+    }
+
+    public void stopSimulation(Event event){
         this.isMoving = false;
     }
 
@@ -164,6 +228,11 @@ public class ViewController implements Initializable {
 
            // }
         }
+    }
+
+    public static boolean isNumeric(String str)
+    {
+        return str.matches("-?\\d+(\\.\\d+)?");  //match a number with optional '-' and decimal.
     }
 
 }
