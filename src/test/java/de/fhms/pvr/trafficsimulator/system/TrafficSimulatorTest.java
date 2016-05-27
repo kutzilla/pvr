@@ -104,4 +104,60 @@ public class TrafficSimulatorTest {
         trafficSimulator.moveCarPixels();
         assertArrayEquals(expectedStreet, trafficSimulator.getStreet());
     }
+
+    @Test
+    public void testSwitchTrackOfCarPixelsIsPosible() {
+        testStreet = new Vehicle[2][20];
+        testStreet[0][5] = new Vehicle(5);
+        testStreet[0][11] = new Vehicle(3);
+
+        expectedStreet = new Vehicle[2][20];
+        expectedStreet[1][5] = new Vehicle(5);
+        expectedStreet[0][11] = new Vehicle(3);
+
+
+        trafficSimulator = new TrafficSimulator(testStreet);
+        trafficSimulator.setSwitchProbability(1.0);
+        trafficSimulator.switchTrackOfCarPixels();
+        assertArrayEquals(expectedStreet, trafficSimulator.getStreet());
+    }
+
+    @Test
+    public void testSwitchTrackOfCarPixelsIsNotPosibleInBack() {
+        testStreet = new Vehicle[2][20];
+        testStreet[0][5] = new Vehicle(5);
+        testStreet[0][8] = new Vehicle(3);
+        testStreet[1][1] = new Vehicle(2);
+
+        expectedStreet = new Vehicle[2][20];
+        expectedStreet[0][5] = new Vehicle(5);
+        expectedStreet[0][8] = new Vehicle(3);
+        expectedStreet[1][1] = new Vehicle(2);
+
+        trafficSimulator = new TrafficSimulator(testStreet);
+        trafficSimulator.setSwitchProbability(1.0);
+        trafficSimulator.switchTrackOfCarPixels();
+        assertArrayEquals(expectedStreet, trafficSimulator.getStreet());
+    }
+
+    @Test
+    public void testSwitchTrackOfCarPixelsIsNotPosibleInFront() {
+        testStreet = new Vehicle[2][20];
+        testStreet[0][5] = new Vehicle(5);
+        testStreet[0][8] = new Vehicle(3);
+        testStreet[1][11] = new Vehicle(2);
+
+        expectedStreet = new Vehicle[2][20];
+        expectedStreet[0][5] = new Vehicle(5);
+        expectedStreet[0][8] = new Vehicle(3);
+        expectedStreet[1][11] = new Vehicle(2);
+
+        trafficSimulator = new TrafficSimulator(testStreet);
+        trafficSimulator.setSwitchProbability(1.0);
+        trafficSimulator.switchTrackOfCarPixels();
+        assertArrayEquals(expectedStreet, trafficSimulator.getStreet());
+    }
+
+
+
 }
