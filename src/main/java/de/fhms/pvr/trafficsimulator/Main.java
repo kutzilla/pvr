@@ -9,23 +9,25 @@ import static org.fusesource.jansi.Ansi.ansi;
 public class Main {
 
     public static void main(String[] args) {
-        int trackAmount = 6;
-        int sectionAmount = 29507;
+        int trackAmount = 3;
+        int sectionAmount = 100000;
         double p0 = 0.2;
         double p = 0.2;
         double rho = 0.5;
         double c = 0.4;
+        int threadAmount = 2;
 
-        TrafficSimulator trafficSimulator = new TrafficSimulator(trackAmount, sectionAmount, rho, p0, p, c);
-        for (int i = 0; i < 100; i++) {
+        TrafficSimulator trafficSimulator = new TrafficSimulator(trackAmount, sectionAmount, rho, p0, p, c, threadAmount);
+        for (int i = 0; i < 20; i++) {
             trafficSimulator.iterate();
-            printField(trafficSimulator.getStreet());
+            //printField(trafficSimulator.getStreet());
         }
         System.out.println(ansi().reset());
+        System.out.println("Spur wechseln:\t" + trafficSimulator.getTotalSwitchingTrackTime() + "ms");
         System.out.println("Beschleunigen:\t" + trafficSimulator.getTotalAccelerateTime() + "ms");
-        System.out.println("Bremsen:\t\t" + trafficSimulator.getTotalBreakTime() + "ms");
-        System.out.println("Trödeln:\t\t" + trafficSimulator.getTotalLinderTime() + "ms");
-        System.out.println("Fortbewegen:\t" + trafficSimulator.getTotalMoveTime() + "ms");
+        System.out.println("Bremsen:\t\t" + trafficSimulator.getTotalDecelerationTime() + "ms");
+        System.out.println("Trödeln:\t\t" + trafficSimulator.getTotalDawdleTime() + "ms");
+        System.out.println("Fortbewegen:\t" + trafficSimulator.getTotalMovementTime() + "ms");
         System.out.println("\r\nGesamt:\t\t\t" + trafficSimulator.getTotalSimulationTime() + "ms");
     }
 

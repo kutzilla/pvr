@@ -1,10 +1,13 @@
 package de.fhms.pvr.trafficsimulator.system;
 
+import de.fhms.pvr.trafficsimulator.system.worker.AccelerateWorker;
+
 import java.util.SplittableRandom;
+import java.util.concurrent.ExecutorService;
 
 public class TrafficSimulator {
 
-    private Vehicle[][] street;
+    volatile private Vehicle[][] street;
 
     private SplittableRandom randomGenerator;
 
@@ -16,24 +19,37 @@ public class TrafficSimulator {
 
     private int iteration;
 
-    private long totalBreakTime;
+    private long totalDecelerationTime;
+
+    private long totalSwitchingTrackTime;
 
     private long totalAccelerateTime;
 
-    private long totalLinderTime;
+    private long totalDawdleTime;
 
-    private long totalMoveTime;
+    private long totalMovementTime;
 
     private long totalSimulationTime;
+
+    private int bound;
+
+    private ExecutorService executorService;
+
+    private int threadAmount;
+
+    private AccelerateWorker[] accelerateWorkers;
 
     protected TrafficSimulator(Vehicle[][] street) {
         this.street = street;
         this.iteration = 0;
         this.randomGenerator = new SplittableRandom();
+        this.threadAmount = 2;
+        this.bound = street[0].length / threadAmount;
     }
 
     public TrafficSimulator(int trackAmount, int sectionAmount, double vehicleDensity,
-                            double slowDawdleProbability, double fastDawdleProbability, double switchProbability) {
+                                double slowDawdleProbability, double fastDawdleProbability, double switchProbability,
+                                    int threadAmount) {
         this.street = new Vehicle[trackAmount][sectionAmount];
         this.randomGenerator = new SplittableRandom();
         this.slowDawdleProbability = slowDawdleProbability;
@@ -52,6 +68,9 @@ public class TrafficSimulator {
             } while(street[randomTrackIndex][randomSectionIndex] != null);
             street[randomTrackIndex][randomSectionIndex] = tmp;
         }
+
+        this.threadAmount = threadAmount;
+        this.bound = sectionAmount / threadAmount;
     }
 
     public void iterate() {
@@ -60,7 +79,11 @@ public class TrafficSimulator {
         if (street[0].length > 1) {
             simulateTrackSwitching();
         }
-        simulateAcceleration();
+        try {
+            simulateAcceleration();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         simulateDeceleration();
         simulateDawdling();
         simulateMovement();
@@ -68,6 +91,7 @@ public class TrafficSimulator {
     }
 
     protected void simulateTrackSwitching() {
+        long before = System.currentTimeMillis();
         Vehicle currentVehicle;
         int switchTrackIndex, tmpSectionIndex;
         boolean switchTrack;
@@ -106,7 +130,7 @@ public class TrafficSimulator {
                 }
             }
         }
-
+        totalSwitchingTrackTime += System.currentTimeMillis() - before;
     }
 
     private boolean isSwitchToTrackPossible(int trackIndex, int sectionIndex, int currentSpeed) {
@@ -125,16 +149,20 @@ public class TrafficSimulator {
         return true;
     }
 
-    protected void simulateAcceleration() {
-        long beforeAccelerate = System.currentTimeMillis();
-        Vehicle tmp;
-        for (int y = 0; y < street.length; y++) {
-            for (int x = 0; x < street[y].length; x++) {
-                if ((tmp = street[y][x]) != null) {
-                    tmp.incrementCurrentSpeed();
-                }
-            }
+    protected void simulateAcceleration() throws InterruptedException {
+        AccelerateWorker workers[] = new AccelerateWorker[threadAmount];
+        int index;
+        for (int i = 0; i < workers.length; i++) {
+            index = i * bound;
+            workers[i] = new AccelerateWorker(this.street, index, index + bound);
         }
+
+        long beforeAccelerate = System.currentTimeMillis();
+        for (AccelerateWorker worker: workers) {
+            worker.start();
+            worker.join();
+        }
+
         totalAccelerateTime += System.currentTimeMillis() - beforeAccelerate;
     }
 
@@ -158,7 +186,7 @@ public class TrafficSimulator {
                 }
             }
         }
-        totalBreakTime += System.currentTimeMillis() - beforeBreak;
+        totalDecelerationTime += System.currentTimeMillis() - beforeBreak;
     }
 
     protected void simulateDawdling() {
@@ -180,7 +208,7 @@ public class TrafficSimulator {
                 }
             }
         }
-        totalLinderTime += System.currentTimeMillis() - beforeLinder;
+        totalDawdleTime += System.currentTimeMillis() - beforeLinder;
     }
 
     protected void simulateMovement() {
@@ -199,7 +227,7 @@ public class TrafficSimulator {
                 }
             }
         }
-        totalMoveTime += System.currentTimeMillis() - beforeMove;
+        totalMovementTime += System.currentTimeMillis() - beforeMove;
     }
 
     public void printStreetField() {
@@ -234,20 +262,20 @@ public class TrafficSimulator {
         return totalSimulationTime;
     }
 
-    public long getTotalMoveTime() {
-        return totalMoveTime;
+    public long getTotalMovementTime() {
+        return totalMovementTime;
     }
 
-    public long getTotalLinderTime() {
-        return totalLinderTime;
+    public long getTotalDawdleTime() {
+        return totalDawdleTime;
     }
 
     public long getTotalAccelerateTime() {
         return totalAccelerateTime;
     }
 
-    public long getTotalBreakTime() {
-        return totalBreakTime;
+    public long getTotalDecelerationTime() {
+        return totalDecelerationTime;
     }
 
     protected void setIteration(int iteration) {
@@ -268,5 +296,9 @@ public class TrafficSimulator {
 
     protected void setSwitchProbability(double switchProbability) {
         this.switchProbability = switchProbability;
+    }
+
+    public long getTotalSwitchingTrackTime() {
+        return totalSwitchingTrackTime;
     }
 }

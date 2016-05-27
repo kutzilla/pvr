@@ -13,7 +13,7 @@ public class TrafficSimulatorTest {
     private TrafficSimulator trafficSimulator;
 
     @Test
-    public void testSimulateAcceleration() {
+    public void testSimulateAcceleration() throws Exception {
         testStreet = new Vehicle[1][10];
         testStreet[0][0] = new Vehicle(4);
         testStreet[0][5] = new Vehicle(2);
@@ -158,7 +158,7 @@ public class TrafficSimulatorTest {
     }
 
     @Test
-    public void testSimulateTrackSwitchingIsPossibleWithThreeTracks() {
+    public void testSwitchTrackWithThreeTracks() {
         testStreet = new Vehicle[3][20];
         testStreet[2][2] = new Vehicle(5);
         testStreet[2][5] = new Vehicle(3);
