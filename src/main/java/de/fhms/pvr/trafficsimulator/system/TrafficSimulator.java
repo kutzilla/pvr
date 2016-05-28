@@ -1,9 +1,11 @@
 package de.fhms.pvr.trafficsimulator.system;
 
+import de.fhms.pvr.trafficsimulator.system.measure.TimeMeasureController;
 import de.fhms.pvr.trafficsimulator.system.worker.AccelerateWorker;
 
 import java.util.SplittableRandom;
-import java.util.concurrent.ExecutorService;
+
+import static de.fhms.pvr.trafficsimulator.system.measure.TimeMeasureType.*;
 
 public class TrafficSimulator {
 
@@ -19,30 +21,17 @@ public class TrafficSimulator {
 
     private int iteration;
 
-    private long totalDecelerationTime;
-
-    private long totalSwitchingTrackTime;
-
-    private long totalAccelerateTime;
-
-    private long totalDawdleTime;
-
-    private long totalMovementTime;
-
-    private long totalSimulationTime;
-
     private int bound;
-
-    private ExecutorService executorService;
 
     private int threadAmount;
 
-    private AccelerateWorker[] accelerateWorkers;
+    private TimeMeasureController timeMeasureController;
 
     protected TrafficSimulator(Vehicle[][] street) {
         this.street = street;
         this.iteration = 0;
         this.randomGenerator = new SplittableRandom();
+        this.timeMeasureController = new TimeMeasureController();
         this.threadAmount = 2;
         this.bound = street[0].length / threadAmount;
     }
@@ -51,6 +40,7 @@ public class TrafficSimulator {
                                 double slowDawdleProbability, double fastDawdleProbability, double switchProbability,
                                     int threadAmount) {
         this.street = new Vehicle[trackAmount][sectionAmount];
+        this.timeMeasureController = new TimeMeasureController();
         this.randomGenerator = new SplittableRandom();
         this.slowDawdleProbability = slowDawdleProbability;
         this.fastDawdleProbability = fastDawdleProbability;
@@ -74,7 +64,7 @@ public class TrafficSimulator {
     }
 
     public void iterate() {
-        long before = System.currentTimeMillis();
+        timeMeasureController.startOrResume(ITERATION);
         this.iteration++;
         if (street[0].length > 1) {
             simulateTrackSwitching();
@@ -87,11 +77,11 @@ public class TrafficSimulator {
         simulateDeceleration();
         simulateDawdling();
         simulateMovement();
-        totalSimulationTime += System.currentTimeMillis() - before;
+        timeMeasureController.suspend(ITERATION);
     }
 
     protected void simulateTrackSwitching() {
-        long before = System.currentTimeMillis();
+        timeMeasureController.startOrResume(TRACK_SWITCHING);
         Vehicle currentVehicle;
         int switchTrackIndex, tmpSectionIndex;
         boolean switchTrack;
@@ -130,7 +120,7 @@ public class TrafficSimulator {
                 }
             }
         }
-        totalSwitchingTrackTime += System.currentTimeMillis() - before;
+        timeMeasureController.suspend(TRACK_SWITCHING);
     }
 
     private boolean isSwitchToTrackPossible(int trackIndex, int sectionIndex, int currentSpeed) {
@@ -157,17 +147,16 @@ public class TrafficSimulator {
             workers[i] = new AccelerateWorker(this.street, index, index + bound);
         }
 
-        long beforeAccelerate = System.currentTimeMillis();
+        timeMeasureController.startOrResume(ACCELERATION);
         for (AccelerateWorker worker: workers) {
             worker.start();
             worker.join();
         }
-
-        totalAccelerateTime += System.currentTimeMillis() - beforeAccelerate;
+        timeMeasureController.suspend(ACCELERATION);
     }
 
     protected void simulateDeceleration() {
-        long beforeBreak = System.currentTimeMillis();
+        timeMeasureController.startOrResume(DECELERATION);
         Vehicle tmp;
         int tmpSpeed, tmpIndex;
         for (int y = 0; y < street.length; y++) {
@@ -186,33 +175,33 @@ public class TrafficSimulator {
                 }
             }
         }
-        totalDecelerationTime += System.currentTimeMillis() - beforeBreak;
+        timeMeasureController.suspend(DECELERATION);
     }
 
     protected void simulateDawdling() {
-        long beforeLinder = System.currentTimeMillis();
-        boolean linders;
+        timeMeasureController.startOrResume(DAWDLING);
+        boolean dawdle;
         int tmpCurrentSpeed;
         Vehicle tmp;
         for (int y = 0; y < street.length; y++) {
             for (int x = 0; x < street[y].length; x++) {
                 if ((tmp = street[y][x]) != null && (tmpCurrentSpeed = tmp.getCurrentSpeed()) > 0) {
                     if (tmpCurrentSpeed > 1) {
-                        linders = (((double) randomGenerator.nextInt(100)) / 100) <= fastDawdleProbability;
+                        dawdle = (((double) randomGenerator.nextInt(100)) / 100) <= fastDawdleProbability;
                     } else {
-                        linders = (((double) randomGenerator.nextInt(100)) / 100) <= slowDawdleProbability;
+                        dawdle = (((double) randomGenerator.nextInt(100)) / 100) <= slowDawdleProbability;
                     }
-                    if (linders) {
+                    if (dawdle) {
                         tmp.decrementCurrentSpeed();
                     }
                 }
             }
         }
-        totalDawdleTime += System.currentTimeMillis() - beforeLinder;
+        timeMeasureController.suspend(DAWDLING);
     }
 
     protected void simulateMovement() {
-        long beforeMove = System.currentTimeMillis();
+        timeMeasureController.startOrResume(MOVEMENT);
         Vehicle tmp;
         int tmpIndex, tmpSpeed;
         for (int y = 0; y < street.length; y++) {
@@ -227,55 +216,19 @@ public class TrafficSimulator {
                 }
             }
         }
-        totalMovementTime += System.currentTimeMillis() - beforeMove;
-    }
-
-    public void printStreetField() {
-        Vehicle tmp;
-        for (int i = 0; i < street[0].length; i++) {
-            System.out.print("|" + (i % 10) + "| ");
-        }
-        System.out.println("\r\n");
-        for (int i = 0; i < street.length; i++) {
-            for (int j = 0; j < street[i].length; j++) {
-                tmp = street[i][j];
-                if (tmp != null && tmp.getCurrentSpeed() >= 0) {
-                    System.out.print("[" + tmp.getCurrentSpeed() + "] ");
-                } else {
-                    System.out.print("[ ] ");
-                }
-            }
-            System.out.println();
-        }
-        System.out.println();
+        timeMeasureController.suspend(MOVEMENT);
     }
 
     public Vehicle[][] getStreet() {
         return street;
     }
 
+    public TimeMeasureController getTimeMeasureController() {
+        return timeMeasureController;
+    }
+
     public int getIteration() {
         return iteration;
-    }
-
-    public long getTotalSimulationTime() {
-        return totalSimulationTime;
-    }
-
-    public long getTotalMovementTime() {
-        return totalMovementTime;
-    }
-
-    public long getTotalDawdleTime() {
-        return totalDawdleTime;
-    }
-
-    public long getTotalAccelerateTime() {
-        return totalAccelerateTime;
-    }
-
-    public long getTotalDecelerationTime() {
-        return totalDecelerationTime;
     }
 
     protected void setIteration(int iteration) {
@@ -298,7 +251,4 @@ public class TrafficSimulator {
         this.switchProbability = switchProbability;
     }
 
-    public long getTotalSwitchingTrackTime() {
-        return totalSwitchingTrackTime;
-    }
 }
