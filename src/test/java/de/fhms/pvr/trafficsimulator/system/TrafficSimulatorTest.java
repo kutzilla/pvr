@@ -30,7 +30,7 @@ public class TrafficSimulatorTest {
     }
 
     @Test
-    public void testSimulateDeceleration() {
+    public void testSimulateDeceleration() throws Exception {
         testStreet = new Vehicle[1][10];
         testStreet[0][0] = new Vehicle(5);
         testStreet[0][1] = new Vehicle(2);

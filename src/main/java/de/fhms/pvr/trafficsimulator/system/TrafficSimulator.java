@@ -2,6 +2,7 @@ package de.fhms.pvr.trafficsimulator.system;
 
 import de.fhms.pvr.trafficsimulator.system.measure.TimeMeasureController;
 import de.fhms.pvr.trafficsimulator.system.worker.AccelerateWorker;
+import de.fhms.pvr.trafficsimulator.system.worker.DecelerateWorker;
 
 import java.util.SplittableRandom;
 
@@ -37,8 +38,8 @@ public class TrafficSimulator {
     }
 
     public TrafficSimulator(int trackAmount, int sectionAmount, double vehicleDensity,
-                                double slowDawdleProbability, double fastDawdleProbability, double switchProbability,
-                                    int threadAmount) {
+                            double slowDawdleProbability, double fastDawdleProbability, double switchProbability,
+                            int threadAmount) {
         this.street = new Vehicle[trackAmount][sectionAmount];
         this.timeMeasureController = new TimeMeasureController();
         this.randomGenerator = new SplittableRandom();
@@ -55,7 +56,7 @@ public class TrafficSimulator {
             do {
                 randomTrackIndex = randomGenerator.nextInt(trackAmount);
                 randomSectionIndex = randomGenerator.nextInt(sectionAmount);
-            } while(street[randomTrackIndex][randomSectionIndex] != null);
+            } while (street[randomTrackIndex][randomSectionIndex] != null);
             street[randomTrackIndex][randomSectionIndex] = tmp;
         }
 
@@ -71,10 +72,10 @@ public class TrafficSimulator {
         }
         try {
             simulateAcceleration();
+            simulateDeceleration();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        simulateDeceleration();
         simulateDawdling();
         simulateMovement();
         timeMeasureController.suspend(ITERATION);
@@ -148,32 +149,25 @@ public class TrafficSimulator {
         }
 
         timeMeasureController.startOrResume(ACCELERATION);
-        for (AccelerateWorker worker: workers) {
+        for (AccelerateWorker worker : workers) {
             worker.start();
             worker.join();
         }
         timeMeasureController.suspend(ACCELERATION);
     }
 
-    protected void simulateDeceleration() {
+    protected void simulateDeceleration() throws InterruptedException {
+        int index;
+        DecelerateWorker workers[] = new DecelerateWorker[threadAmount];
+        for (int i = 0; i < workers.length; i++) {
+            index = i * bound;
+            workers[i] = new DecelerateWorker(this.street, index, index + bound);
+        }
+
         timeMeasureController.startOrResume(DECELERATION);
-        Vehicle tmp;
-        int tmpSpeed, tmpIndex;
-        for (int y = 0; y < street.length; y++) {
-            for (int x = 0; x < street[y].length; x++) {
-                if ((tmp = street[y][x]) != null) {
-                    tmpSpeed = tmp.getCurrentSpeed();
-                    if (tmpSpeed > 0) {
-                        for (int i = 1; i <= tmp.getCurrentSpeed(); i++) {
-                            tmpIndex = (x + i) % street[y].length;
-                            if (street[y][tmpIndex] != null) {
-                                tmp.setCurrentSpeed(i - 1);
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
+        for (DecelerateWorker worker : workers) {
+            worker.start();
+            worker.join();
         }
         timeMeasureController.suspend(DECELERATION);
     }

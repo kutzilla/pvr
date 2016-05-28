@@ -2,18 +2,10 @@ package de.fhms.pvr.trafficsimulator.system.worker;
 
 import de.fhms.pvr.trafficsimulator.system.Vehicle;
 
-public class AccelerateWorker extends Thread {
-
-    private Vehicle[][] street;
-
-    private int lowerBorder;
-
-    private int upperBorder;
+public class AccelerateWorker extends AbstractWorker {
 
     public AccelerateWorker(Vehicle[][] street, int lowerBorder, int upperBorder) {
-        this.street = street;
-        this.lowerBorder = lowerBorder;
-        this.upperBorder = upperBorder;
+        super(street,lowerBorder,upperBorder);
     }
 
     @Override
