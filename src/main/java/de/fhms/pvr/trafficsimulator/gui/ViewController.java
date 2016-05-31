@@ -3,6 +3,7 @@ package de.fhms.pvr.trafficsimulator.gui;
 
 import de.fhms.pvr.trafficsimulator.system.TrafficSimulator;
 import de.fhms.pvr.trafficsimulator.system.Vehicle;
+import de.fhms.pvr.trafficsimulator.system.measure.TimeMeasureType;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
@@ -18,6 +19,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 
+import static de.fhms.pvr.trafficsimulator.system.measure.TimeMeasureType.*;
 import static org.fusesource.jansi.Ansi.ansi;
 
 import java.net.URL;
@@ -102,13 +104,14 @@ public class ViewController implements Initializable {
             int from = Integer.parseInt(txtFrom.getText());
             int to = Integer.parseInt(txtTo.getText());
 
-            TrafficSimulator trafficSimulator = new TrafficSimulator(trackAmount, sectionAmount, rho, p0, p, c);
+            TrafficSimulator trafficSimulator = new TrafficSimulator(trackAmount, sectionAmount, rho, p0, p, c, 2);
 
             final AtomicInteger updateGui = new AtomicInteger(-1);
 
             DrawActualStateRunnable drawRunable = new DrawActualStateRunnable(from, to,
                     trafficSimulator.getStreet(),
-                    trackAmount, canvasCarLayer.getGraphicsContext2D(), updateGui, LINE_WIDTH, PADDING, PIXEL_SIZE,canvasTest.getGraphicsContext2D());
+                    trackAmount, canvasCarLayer.getGraphicsContext2D(), updateGui,
+                    LINE_WIDTH, PADDING, PIXEL_SIZE, canvasTest.getGraphicsContext2D());
 
 
             SimulateTask simulateTask = new SimulateTask(iterations, trafficSimulator);
@@ -125,7 +128,7 @@ public class ViewController implements Initializable {
             });
 
 
-            initSimulationTab(trackAmount,from,to,iterations);
+            initSimulationTab(trackAmount, from, to, iterations);
 
             Thread workerThread = new Thread(simulateTask);
             workerThread.start();
@@ -133,8 +136,8 @@ public class ViewController implements Initializable {
     }
 
     private void initSimulationTab(int trackAmount, int from, int to, int iterations) {
-        drawStreet(canvasStreetLayer.getGraphicsContext2D(), trackAmount, LINE_WIDTH,from,to);
-        scrollPaneLeft.setMaxSize(Double.MAX_VALUE,Double.MAX_VALUE);
+        drawStreet(canvasStreetLayer.getGraphicsContext2D(), trackAmount, LINE_WIDTH, from, to);
+        scrollPaneLeft.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         canvasTest.setHeight(iterations);
         scrollPaneLeft.setContent(canvasTest);
         lblLiveFrom.setText(String.valueOf(from));
@@ -181,7 +184,7 @@ public class ViewController implements Initializable {
     private void resetCanvas() {
         canvasCarLayer.getGraphicsContext2D().clearRect(0, 0, canvasCarLayer.getWidth(), canvasCarLayer.getHeight());
         canvasStreetLayer.getGraphicsContext2D().clearRect(0, 0, canvasStreetLayer.getWidth(), canvasStreetLayer.getHeight());
-        canvasTest.getGraphicsContext2D().clearRect(0,0,canvasTest.getWidth(),canvasTest.getHeight());
+        canvasTest.getGraphicsContext2D().clearRect(0, 0, canvasTest.getWidth(), canvasTest.getHeight());
     }
 
     private class SimulateTask<Integer> extends Task<Integer> {
@@ -212,21 +215,21 @@ public class ViewController implements Initializable {
         protected void succeeded() {
             super.succeeded();
             System.out.println(ansi().reset());
-            System.out.println("Beschleunigen:\t" + simulator.getTotalAccelerateTime() + "ms");
-            System.out.println("Bremsen:\t\t" + simulator.getTotalBreakTime() + "ms");
-            System.out.println("Trödeln:\t\t" + simulator.getTotalLinderTime() + "ms");
-            System.out.println("Fortbewegen:\t" + simulator.getTotalMoveTime() + "ms");
-            System.out.println("\r\nGesamt:\t\t\t" + simulator.getTotalSimulationTime() + "ms");
+            System.out.println("Beschleunigen:\t" + simulator.getTimeMeasureController().getMeasuredTimeFor(ACCELERATION) + "ms");
+            System.out.println("Bremsen:\t\t" + simulator.getTimeMeasureController().getMeasuredTimeFor(DECELERATION) + "ms");
+            System.out.println("Trödeln:\t\t" + simulator.getTimeMeasureController().getMeasuredTimeFor(DAWDLING) + "ms");
+            System.out.println("Fortbewegen:\t" + simulator.getTimeMeasureController().getMeasuredTimeFor(MOVEMENT) + "ms");
+            System.out.println("\r\nGesamt:\t\t\t" + simulator.getTimeMeasureController().getMeasuredTimeFor(ITERATION) + "ms");
         }
     }
 
-    private void drawStreet(GraphicsContext gc, int trackAmount, double lineWidth,int from, int to) {
+    private void drawStreet(GraphicsContext gc, int trackAmount, double lineWidth, int from, int to) {
         //Canvas zurücksetzen
         this.resetCanvas();
         //Straßenfläche
         gc.setFill(Color.DARKGRAY);
         double streetHeight = PIXEL_SIZE * trackAmount + 2 * lineWidth + 2 * PADDING + ((trackAmount - 1) * lineWidth + PADDING) + 1;
-        double streetWidth = (to-from+PADDING) * PIXEL_SIZE;
+        double streetWidth = (to - from + PADDING) * PIXEL_SIZE;
 
         gc.fillRect(0, 0, streetWidth, streetHeight);
 
@@ -275,7 +278,7 @@ public class ViewController implements Initializable {
                 && isNumeric(txtSwitchProb.getText())
                 && isNumeric(txtSectionAmount.getText())
                 && isNumeric(txtFrom.getText())
-                && isNumeric(txtTo.getText()) ){
+                && isNumeric(txtTo.getText())) {
             return true;
         }
         return false;
