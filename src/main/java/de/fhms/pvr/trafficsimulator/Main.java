@@ -8,6 +8,7 @@ import static org.fusesource.jansi.Ansi.ansi;
 
 public class Main {
 
+
     public static void main(String[] args) {
         int trackAmount = 4;
         int sectionAmount = 500000;
@@ -16,12 +17,11 @@ public class Main {
         double rho = 0.4;
         double c = 0.5;
         int threadAmount = 2;
-
-
         TrafficSimulator trafficSimulator = new TrafficSimulator(trackAmount, sectionAmount, rho, p0, p, c, threadAmount);
         for (int i = 0; i < 100; i++) {
             trafficSimulator.iterate();
         }
+
 
         System.out.println("Spur wechseln:\t" + trafficSimulator.getTimeMeasureController()
                 .getMeasuredTimeFor(TimeMeasureType.TRACK_SWITCHING) + "ms");

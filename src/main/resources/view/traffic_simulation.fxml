@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.effect.*?>
+<?import java.lang.*?>
+<?import javafx.scene.canvas.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="653.0" prefWidth="796.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.fhms.pvr.trafficsimulator.gui.ViewController">
+   <children>
+      <TabPane id="tabPane" fx:id="tabPaneRoot" layoutY="28.0" prefHeight="600.0" prefWidth="800.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
+        <tabs>
+            <Tab text="Config">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <TextField fx:id="txtTracks" layoutX="155.0" layoutY="64.0" prefHeight="25.0" prefWidth="60.0" />
+                        <TextField fx:id="txtIterations" layoutX="155.0" layoutY="98.0" prefHeight="25.0" prefWidth="60.0" />
+                        <TextField fx:id="txtSectionAmount" layoutX="155.0" layoutY="131.0" prefHeight="25.0" prefWidth="60.0" />
+                        <TextField fx:id="txtP" layoutX="155.0" layoutY="165.0" prefHeight="25.0" prefWidth="60.0" />
+                        <TextField fx:id="txtP0" layoutX="155.0" layoutY="202.0" prefHeight="25.0" prefWidth="60.0" />
+                        <TextField fx:id="txtRho" layoutX="155.0" layoutY="239.0" prefHeight="25.0" prefWidth="60.0" />
+                        <TextField fx:id="txtSwitchProb" layoutX="155.0" layoutY="276.0" prefHeight="25.0" prefWidth="60.0" />
+                        <TextField fx:id="txtFrom" layoutX="287.0" layoutY="64.0" prefHeight="25.0" prefWidth="54.0" />
+                        <TextField fx:id="txtTo" layoutX="400.0" layoutY="64.0" prefHeight="25.0" prefWidth="48.0" />
+                        <Label layoutX="84.0" layoutY="27.0" text="Config" />
+                        <Label layoutX="14.0" layoutY="68.0" text="Anz. Spuren:" />
+                        <Label layoutX="14.0" layoutY="102.0" text="Anz. Iterationen:" />
+                        <Label layoutX="13.0" layoutY="169.0" text="p (Trödelwahrschein.):" />
+                        <Label layoutX="13.0" layoutY="206.0" text="p0 (Trödwahrsch Stau):" />
+                        <Label layoutX="13.0" layoutY="243.0" text="Fahrzeugdichte:" />
+                        <Label layoutX="13.0" layoutY="280.0" text="Spurwechselwahrsch.:" />
+                        <Label layoutX="14.0" layoutY="135.0" text="Anz. Spurenabschnitte:" />
+                        <Button fx:id="btnDefault" layoutX="14.0" layoutY="325.0" mnemonicParsing="false" onAction="#resetToDefault" text="default" />
+                        <Label layoutX="251.0" layoutY="68.0" text="von:" />
+                        <Label layoutX="363.0" layoutY="68.0" text="bis:" />
+                     </children>
+                  </AnchorPane>
+              </content>
+            </Tab>
+          <Tab fx:id="tabSimulation" text="Simulation">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="630.0" prefWidth="839.0">
+                     <children>
+                        <Canvas id="streetCanvas" fx:id="canvasStreetLayer" height="132.0" layoutY="440.0" width="800.0" AnchorPane.bottomAnchor="-1.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="440.0" />
+                        <Button id="btnStart" layoutX="14.0" layoutY="38.0" mnemonicParsing="false" onAction="#startSimulation" text="Start" />
+                        <Button layoutX="69.0" layoutY="38.0" mnemonicParsing="false" onAction="#stopSimulation" text="Stop" />
+                        <Canvas fx:id="canvasCarLayer" height="132.0" layoutY="440.0" width="800.0" AnchorPane.bottomAnchor="1.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="440.0" />
+                        <Separator layoutY="425.0" prefHeight="1.0" prefWidth="794.0" />
+                        <Label layoutX="14.0" layoutY="408.0" prefHeight="17.0" prefWidth="193.0" text="Abschnittsansicht für die Abschnitte" />
+                        <Label fx:id="lblLiveFrom" layoutX="214.0" layoutY="408.0" prefHeight="17.0" prefWidth="44.0" />
+                        <Label layoutX="258.0" layoutY="408.0" text="bis" />
+                        <Label fx:id="lblLiveTo" layoutX="276.0" layoutY="408.0" prefHeight="17.0" prefWidth="50.0" />
+                        <SplitPane dividerPositions="0.5008103727714749" layoutX="166.0" layoutY="7.0" prefHeight="400.0" prefWidth="619.0">
+                          <items>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                                 <children>
+                                    <ScrollPane fx:id="scrollPaneLeft" layoutX="14.0" layoutY="14.0" prefHeight="378.0" prefWidth="275.0">
+                                      <content>
+                                        <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="379.0" prefWidth="290.0">
+                                             <children>
+                                                <Canvas fx:id="canvasTest" height="365.0" width="260.0" />
+                                             </children>
+                                          </AnchorPane>
+                                      </content>
+                                    </ScrollPane>
+                                 </children>
+                              </AnchorPane>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="147.0" prefWidth="129.0" />
+                          </items>
+                        </SplitPane>
+                     </children>
+              </AnchorPane>
+            </content>
+          </Tab>
+          <Tab fx:id="tabAnalysis" text="Analyse">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+            </content>
+          </Tab>
+        </tabs>
+      </TabPane>
+   </children>
+</AnchorPane>
