@@ -8,6 +8,7 @@ import static org.fusesource.jansi.Ansi.ansi;
 
 public class Main {
 
+
     public static void main(String[] args) {
 
         int trackAmount = 6;
@@ -28,9 +29,9 @@ public class Main {
         System.out.println("Trödeln:\t\t" + trafficSimulator.getTotalLinderTime() + "ms");
         System.out.println("Fortbewegen:\t" + trafficSimulator.getTotalMoveTime() + "ms");
         System.out.println("\r\nGesamt:\t\t\t" + trafficSimulator.getTotalSimulationTime() + "ms");
-    }
+         }
 
-    public static void printField(Vehicle[][] field) {
+    private static void printField(Vehicle[][] field) {
         String symbol = "▩";
         Vehicle tmp;
         for (int i = 0; i < field.length; i++) {

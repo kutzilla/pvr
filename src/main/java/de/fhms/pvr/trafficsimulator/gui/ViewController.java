@@ -1,17 +1,21 @@
 package de.fhms.pvr.trafficsimulator.gui;
 
 
-import de.fhms.pvr.trafficsimulator.Main;
 import de.fhms.pvr.trafficsimulator.system.TrafficSimulator;
+import de.fhms.pvr.trafficsimulator.system.Vehicle;
 import javafx.animation.AnimationTimer;
+import javafx.application.Platform;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 
 import static org.fusesource.jansi.Ansi.ansi;
@@ -19,19 +23,17 @@ import static org.fusesource.jansi.Ansi.ansi;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- *
  * @author Dave
  */
 public class ViewController implements Initializable {
-
-    private final double LINE_WIDTH =2.0;
-    private final double CAR_WIDTH = 60;
-    private final double CAR_HEIGHT = 20;
-    private final int PIXEL_SIZE = 5;
-
+    private final int PIXEL_SIZE = 12;
+    private final double PADDING = 1.0;
+    private final double LINE_WIDTH = 1.0;
     private boolean isMoving = false;
+
     @FXML
     TabPane tabPaneRoot;
 
@@ -68,171 +70,217 @@ public class ViewController implements Initializable {
     @FXML
     TextField txtSectionAmount;
 
+    @FXML
+    TextField txtFrom;
 
-    public void startSimulation(Event event){
-        if(validateInput()){
+    @FXML
+    TextField txtTo;
+
+    @FXML
+    Label lblLiveFrom;
+
+    @FXML
+    Label lblLiveTo;
+
+    @FXML
+    Canvas canvasTest;
+
+    @FXML
+    ScrollPane scrollPaneLeft;
+
+
+    public void startSimulation(Event event) {
+        if (validateInputFields()) {
+            //Initialisierung der Parameter
             int trackAmount = Integer.parseInt(txtTracks.getText());
             int sectionAmount = Integer.parseInt(txtSectionAmount.getText());
-            double p0  = Double.parseDouble(txtP0.getText());
+            double p0 = Double.parseDouble(txtP0.getText());
             double p = Double.parseDouble(txtP.getText());
-            double rho  = Double.parseDouble(txtRho.getText());
-            double c =  Double.parseDouble(txtSwitchProb.getText());
+            double rho = Double.parseDouble(txtRho.getText());
+            double c = Double.parseDouble(txtSwitchProb.getText());
             int iterations = Integer.parseInt(txtIterations.getText());
+            int from = Integer.parseInt(txtFrom.getText());
+            int to = Integer.parseInt(txtTo.getText());
 
             TrafficSimulator trafficSimulator = new TrafficSimulator(trackAmount, sectionAmount, rho, p0, p, c);
 
-            for (int i = 0; i < iterations; i++) {
-                trafficSimulator.iterate();
-                //Main.printField(trafficSimulator.getStreet());
-            }
+            final AtomicInteger updateGui = new AtomicInteger(-1);
 
-            System.out.println(ansi().reset());
-            System.out.println("Beschleunigen:\t" + trafficSimulator.getTotalAccelerateTime() + "ms");
-            System.out.println("Bremsen:\t\t" + trafficSimulator.getTotalBreakTime() + "ms");
-            System.out.println("Trödeln:\t\t" + trafficSimulator.getTotalLinderTime() + "ms");
-            System.out.println("Fortbewegen:\t" + trafficSimulator.getTotalMoveTime() + "ms");
-            System.out.println("\r\nGesamt:\t\t\t" + trafficSimulator.getTotalSimulationTime() + "ms");
+            DrawActualStateRunnable drawRunable = new DrawActualStateRunnable(from, to,
+                    trafficSimulator.getStreet(),
+                    trackAmount, canvasCarLayer.getGraphicsContext2D(), updateGui, LINE_WIDTH, PADDING, PIXEL_SIZE,canvasTest.getGraphicsContext2D());
 
+
+            SimulateTask simulateTask = new SimulateTask(iterations, trafficSimulator);
+
+            simulateTask.intProperty().addListener(new ChangeListener<Number>() {
+                @Override
+                public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                    //System.out.println("Iteration:" + newValue);
+                    if (updateGui.getAndSet(-1) == -1) {
+                        drawRunable.setIteration(newValue.intValue());
+                        Platform.runLater(drawRunable);
+                    }
+                }
+            });
+
+
+            initSimulationTab(trackAmount,from,to,iterations);
+
+            Thread workerThread = new Thread(simulateTask);
+            workerThread.start();
         }
-
-        //drawStreet(canvasStreetLayer.getGraphicsContext2D());
-        //startCars(canvasCarLayer.getGraphicsContext2D());
     }
 
-    private boolean validateInput() {
-        if(isNumeric(txtTracks.getText())
+    private void initSimulationTab(int trackAmount, int from, int to, int iterations) {
+        drawStreet(canvasStreetLayer.getGraphicsContext2D(), trackAmount, LINE_WIDTH,from,to);
+        scrollPaneLeft.setMaxSize(Double.MAX_VALUE,Double.MAX_VALUE);
+        canvasTest.setHeight(iterations);
+        scrollPaneLeft.setContent(canvasTest);
+        lblLiveFrom.setText(String.valueOf(from));
+        lblLiveTo.setText(String.valueOf(to));
+    }
+
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        initDefaultValues();
+    }
+
+    public void stopSimulation(Event event) {
+        this.isMoving = false;
+    }
+
+    /**
+     * Zurücksetzen der Standardwerte für die Input-Textfelder
+     *
+     * @param event
+     */
+    public void resetToDefault(Event event) {
+        this.initDefaultValues();
+    }
+
+    /**
+     * Initialisierung von Standardwerten für die Parameter beim Starten der Applikation
+     */
+    private void initDefaultValues() {
+        txtTracks.setText("2");
+        txtSectionAmount.setText("1000");
+        txtSwitchProb.setText("0.5");
+        txtRho.setText("0.4");
+        txtP.setText("0.2");
+        txtP0.setText("0.2");
+        txtIterations.setText("1000");
+        txtFrom.setText("0");
+        txtTo.setText("100");
+    }
+
+    /**
+     * Setzt die beiden Canvas zurück
+     */
+    private void resetCanvas() {
+        canvasCarLayer.getGraphicsContext2D().clearRect(0, 0, canvasCarLayer.getWidth(), canvasCarLayer.getHeight());
+        canvasStreetLayer.getGraphicsContext2D().clearRect(0, 0, canvasStreetLayer.getWidth(), canvasStreetLayer.getHeight());
+        canvasTest.getGraphicsContext2D().clearRect(0,0,canvasTest.getWidth(),canvasTest.getHeight());
+    }
+
+    private class SimulateTask<Integer> extends Task<Integer> {
+        private IntegerProperty intProperty;
+        private final int iterations;
+        private final TrafficSimulator simulator;
+
+        public SimulateTask(int iterations, TrafficSimulator simulator) {
+            this.iterations = iterations;
+            this.simulator = simulator;
+            this.intProperty = new SimpleIntegerProperty(this, "int", 0);
+        }
+
+        public IntegerProperty intProperty() {
+            return intProperty;
+        }
+
+        @Override
+        protected Integer call() throws Exception {
+            for (int i = 0; i < iterations; i++) {
+                simulator.iterate();
+                intProperty.set(intProperty.get() + 1);
+            }
+            return null;
+        }
+
+        @Override
+        protected void succeeded() {
+            super.succeeded();
+            System.out.println(ansi().reset());
+            System.out.println("Beschleunigen:\t" + simulator.getTotalAccelerateTime() + "ms");
+            System.out.println("Bremsen:\t\t" + simulator.getTotalBreakTime() + "ms");
+            System.out.println("Trödeln:\t\t" + simulator.getTotalLinderTime() + "ms");
+            System.out.println("Fortbewegen:\t" + simulator.getTotalMoveTime() + "ms");
+            System.out.println("\r\nGesamt:\t\t\t" + simulator.getTotalSimulationTime() + "ms");
+        }
+    }
+
+    private void drawStreet(GraphicsContext gc, int trackAmount, double lineWidth,int from, int to) {
+        //Canvas zurücksetzen
+        this.resetCanvas();
+        //Straßenfläche
+        gc.setFill(Color.DARKGRAY);
+        double streetHeight = PIXEL_SIZE * trackAmount + 2 * lineWidth + 2 * PADDING + ((trackAmount - 1) * lineWidth + PADDING) + 1;
+        double streetWidth = (to-from+PADDING) * PIXEL_SIZE;
+
+        gc.fillRect(0, 0, streetWidth, streetHeight);
+
+        gc.setStroke(Color.WHITE);
+        gc.setLineWidth(lineWidth);
+        //Oberer Randstreifen
+        gc.strokeLine(0, 1, streetWidth, 1);
+        gc.strokeLine(0, 1, streetWidth, 1);
+        //Unterer Randstreifen
+        gc.strokeLine(0, streetHeight, streetWidth, streetHeight);
+        gc.strokeLine(0, streetHeight, streetWidth, streetHeight);
+
+        //Trennstreifen
+        double y = lineWidth / 4 + PADDING;
+        for (int i = 0; i < trackAmount - 1; i++) {
+            for (int j = 0; j <= streetWidth; j += 6) {
+                gc.strokeLine(j, y + PIXEL_SIZE + PADDING + lineWidth, j - 4, y + PIXEL_SIZE + PADDING + lineWidth);
+            }
+            y += PIXEL_SIZE + lineWidth + PADDING;
+        }
+
+    }
+
+
+    /**
+     * Prüfung ob input ein Int oder Double ist
+     *
+     * @param str
+     * @return boolean
+     */
+    private static boolean isNumeric(String str) {
+        return str.matches("-?\\d+(\\.\\d+)?");  //match a number with optional '-' and decimal.
+    }
+
+    /**
+     * Validierung der Input-Text-Felder
+     *
+     * @return
+     */
+    private boolean validateInputFields() {
+        if (isNumeric(txtTracks.getText())
                 && isNumeric(txtIterations.getText())
                 && isNumeric(txtP.getText())
                 && isNumeric(txtP0.getText())
                 && isNumeric(txtRho.getText())
                 && isNumeric(txtSwitchProb.getText())
-                && isNumeric(txtSectionAmount.getText())){
+                && isNumeric(txtSectionAmount.getText())
+                && isNumeric(txtFrom.getText())
+                && isNumeric(txtTo.getText()) ){
             return true;
         }
         return false;
     }
-
-    public void stopSimulation(Event event){
-        this.isMoving = false;
-    }
-
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-    }
-
-    private void startCars(GraphicsContext gc){
-        //oben
-        CarDraw car = new CarDraw(5,4*CAR_HEIGHT/4-CAR_HEIGHT/2,CAR_WIDTH,CAR_HEIGHT,1);
-        CarDraw car2 = new CarDraw(100,4*CAR_HEIGHT/4-CAR_HEIGHT/2,CAR_WIDTH,CAR_HEIGHT,4);
-        //unten
-        CarDraw car3 = new CarDraw(350,4*CAR_HEIGHT/2+CAR_HEIGHT/2,CAR_WIDTH,CAR_HEIGHT,3);
-        CarDraw car4 = new CarDraw(150,4*CAR_HEIGHT/2+CAR_HEIGHT/2,CAR_WIDTH,CAR_HEIGHT,5);
-
-
-        ArrayList<CarDraw> cars = new ArrayList<CarDraw>();
-        cars.add(car);
-        cars.add(car2);
-        cars.add(car3);
-        cars.add(car4);
-
-
-        isMoving = true;
-        Thread drawThread = new Thread(new DrawRunnable(gc,cars));
-        drawThread.start();
-
-    }
-
-    private void drawStreet(GraphicsContext gc){
-        //Straßenfläche
-        gc.setFill(Color.DARKGRAY);
-        gc.fillRect(0,0,canvasStreetLayer.getWidth(),4*CAR_HEIGHT);
-
-        gc.setStroke(Color.WHITE);
-        gc.setLineWidth(LINE_WIDTH);
-        //Oberer Randstreifen
-        gc.strokeLine(0,2,canvasStreetLayer.getWidth(),2);
-        //Unterer Randstreifen
-        gc.strokeLine(0,4*CAR_HEIGHT-2,canvasStreetLayer.getWidth(),4*CAR_HEIGHT-2);
-        //Mittelstreifen
-        double mid = 4*CAR_HEIGHT/2;
-        for (int i =0; i<=canvasStreetLayer.getWidth(); i+=10){
-            gc.strokeLine(i,mid,i+5,mid);
-        }
-    }
-
-    private class DrawRunnable implements Runnable {
-        private GraphicsContext gc;
-        private ArrayList<CarDraw> cars;
-
-        public DrawRunnable(GraphicsContext gc,ArrayList<CarDraw> cars){
-            this.gc = gc;
-            this.cars = new ArrayList<CarDraw>(cars);
-        }
-        @Override
-        public void run() {
-            final AnimationTimer animationTimer = new AnimationTimer() {
-                long lastUpdateTime = 0;
-                @Override
-                public void handle(long now) {
-                    if ((lastUpdateTime > 0 && isMoving)) { //60ms
-                        System.out.println("UPDATE");
-                        final double elapsedSeconds = (now - lastUpdateTime) / 1_000_000_000.0;
-                        System.out.println("Elapsed Time: " + elapsedSeconds);
-                        for (CarDraw car: cars) {
-                            //final double deltaX = elapsedSeconds * car.getSpeed()*8;
-                            final double oldX = car.getPosX();
-                            gc.clearRect(oldX, car.getPosY(), car.getWidth(), car.getHeight());
-                            final double newX = (oldX + car.getSpeed()) % gc.getCanvas().getWidth();
-                            car.setPosX(newX);
-                            gc.setFill(car.getColor());
-                            gc.fillRect(newX, car.getPosY(), car.getWidth(), car.getHeight());
-                            //gc.drawImage(car.getImage(),newX, car.getPosY(), car.getWidth(), car.getHeight());
-                        }
-                    }else if(!isMoving){
-                        System.out.println("STOP");
-                        this.stop();
-                    }
-                    lastUpdateTime = now;
-                    System.out.println("TEST");
-                }
-
-            };
-            animationTimer.start();
-
-            //while (isMoving) {
-                /*
-                for (CarDraw car:cars) {
-                    final KeyValue kv = new KeyValue(car.getXProperty(), (car.getPosX() + car.getWidth())%gc.getCanvas().getWidth(),
-                            Interpolator.EASE_BOTH);
-                    final KeyFrame kf = new KeyFrame(Duration.millis(60), kv);
-                    timeline.getKeyFrames().add(kf);
-
-                    //gc.setFill(car.getColor());
-                    gc.drawImage(car.getImage(),car.getPosX(), car.getPosY(), car.getWidth(), car.getHeight());
-                    //gc.fillRect(car.getPosX(), car.getPosY(), car.getWidth(), car.getHeight());
-                    car.setPosX(car.getPosX()+car.getWidth() + 10);
-                }
-                timeline.play();
-                /*
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-                for (CarDraw car:cars){
-                    gc.clearRect(car.getPosX(), car.getPosY(), car.getWidth(), car.getHeight());
-                    car.setPosX((car.getPosX() + car.getWidth() + 10)%gc.getCanvas().getWidth());
-                }
-                */
-
-           // }
-        }
-    }
-
-    public static boolean isNumeric(String str)
-    {
-        return str.matches("-?\\d+(\\.\\d+)?");  //match a number with optional '-' and decimal.
-    }
-
 }
+
+
+
