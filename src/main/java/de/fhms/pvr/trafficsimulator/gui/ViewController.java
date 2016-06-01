@@ -2,9 +2,6 @@ package de.fhms.pvr.trafficsimulator.gui;
 
 
 import de.fhms.pvr.trafficsimulator.system.TrafficSimulator;
-import de.fhms.pvr.trafficsimulator.system.Vehicle;
-import de.fhms.pvr.trafficsimulator.system.measure.TimeMeasureType;
-import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -18,19 +15,22 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.paint.Color;
-
-import static de.fhms.pvr.trafficsimulator.system.measure.TimeMeasureType.*;
-import static org.fusesource.jansi.Ansi.ansi;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static de.fhms.pvr.trafficsimulator.system.measure.TimeMeasureType.*;
 
 /**
  * @author Dave
  */
 public class ViewController implements Initializable {
+
+    private static final Logger LOG = LogManager.getLogger(ViewController.class);
+
     private final int PIXEL_SIZE = 12;
     private final double PADDING = 1.0;
     private final double LINE_WIDTH = 1.0;
@@ -119,7 +119,6 @@ public class ViewController implements Initializable {
             simulateTask.intProperty().addListener(new ChangeListener<Number>() {
                 @Override
                 public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                    //System.out.println("Iteration:" + newValue);
                     if (updateGui.getAndSet(-1) == -1) {
                         drawRunable.setIteration(newValue.intValue());
                         Platform.runLater(drawRunable);
@@ -214,12 +213,11 @@ public class ViewController implements Initializable {
         @Override
         protected void succeeded() {
             super.succeeded();
-            System.out.println(ansi().reset());
-            System.out.println("Beschleunigen:\t" + simulator.getTimeMeasureController().getMeasuredTimeFor(ACCELERATION) + "ms");
-            System.out.println("Bremsen:\t\t" + simulator.getTimeMeasureController().getMeasuredTimeFor(DECELERATION) + "ms");
-            System.out.println("Trödeln:\t\t" + simulator.getTimeMeasureController().getMeasuredTimeFor(DAWDLING) + "ms");
-            System.out.println("Fortbewegen:\t" + simulator.getTimeMeasureController().getMeasuredTimeFor(MOVEMENT) + "ms");
-            System.out.println("\r\nGesamt:\t\t\t" + simulator.getTimeMeasureController().getMeasuredTimeFor(ITERATION) + "ms");
+            LOG.info("Beschleunigen:\t" + simulator.getTimeMeasureController().getMeasuredTimeFor(ACCELERATION) + "ms");
+            LOG.info("Bremsen:\t\t" + simulator.getTimeMeasureController().getMeasuredTimeFor(DECELERATION) + "ms");
+            LOG.info("Trödeln:\t\t" + simulator.getTimeMeasureController().getMeasuredTimeFor(DAWDLING) + "ms");
+            LOG.info("Fortbewegen:\t" + simulator.getTimeMeasureController().getMeasuredTimeFor(MOVEMENT) + "ms");
+            LOG.info("Gesamt:\t\t" + simulator.getTimeMeasureController().getMeasuredTimeFor(ITERATION) + "ms");
         }
     }
 
