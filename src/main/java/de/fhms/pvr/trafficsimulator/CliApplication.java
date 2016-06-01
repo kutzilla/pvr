@@ -3,37 +3,38 @@ package de.fhms.pvr.trafficsimulator;
 
 import de.fhms.pvr.trafficsimulator.system.TrafficSimulator;
 import de.fhms.pvr.trafficsimulator.system.measure.TimeMeasureType;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import static org.fusesource.jansi.Ansi.ansi;
+public class CliApplication {
 
-public class Main {
-
+    private static final Logger LOG = LogManager.getLogger(CliApplication.class);
 
     public static void main(String[] args) {
         int trackAmount = 4;
-        int sectionAmount = 500000;
+        int sectionAmount = 1000;
         double p0 = 0.2;
         double p = 0.2;
         double rho = 0.4;
         double c = 0.5;
         int threadAmount = 2;
         TrafficSimulator trafficSimulator = new TrafficSimulator(trackAmount, sectionAmount, rho, p0, p, c, threadAmount);
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 1000; i++) {
             trafficSimulator.iterate();
         }
 
 
-        System.out.println("Spur wechseln:\t" + trafficSimulator.getTimeMeasureController()
+        LOG.info("Spur wechseln:\t" + trafficSimulator.getTimeMeasureController()
                 .getMeasuredTimeFor(TimeMeasureType.TRACK_SWITCHING) + "ms");
-        System.out.println("Beschleunigen:\t" + trafficSimulator.getTimeMeasureController()
+        LOG.info("Beschleunigen:\t" + trafficSimulator.getTimeMeasureController()
                 .getMeasuredTimeFor(TimeMeasureType.ACCELERATION) + "ms");
-        System.out.println("Bremsen:\t\t" + trafficSimulator.getTimeMeasureController()
+        LOG.info("Bremsen:\t\t" + trafficSimulator.getTimeMeasureController()
                 .getMeasuredTimeFor(TimeMeasureType.DECELERATION) + "ms");
-        System.out.println("Trödeln:\t\t" + trafficSimulator.getTimeMeasureController()
+        LOG.info("Trödeln:\t\t" + trafficSimulator.getTimeMeasureController()
                 .getMeasuredTimeFor(TimeMeasureType.DAWDLING) + "ms");
-        System.out.println("Fortbewegen:\t" + trafficSimulator.getTimeMeasureController()
+        LOG.info("Fortbewegen:\t" + trafficSimulator.getTimeMeasureController()
                 .getMeasuredTimeFor(TimeMeasureType.MOVEMENT) + "ms");
-        System.out.println("\r\nIterationen:\t" + trafficSimulator.getTimeMeasureController()
+        LOG.info("\r\nIterationen:\t" + trafficSimulator.getTimeMeasureController()
                 .getMeasuredTimeFor(TimeMeasureType.ITERATION) + "ms");
     }
 
