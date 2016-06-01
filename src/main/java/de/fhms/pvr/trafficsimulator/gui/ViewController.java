@@ -106,27 +106,13 @@ public class ViewController implements Initializable {
 
             TrafficSimulator trafficSimulator = new TrafficSimulator(trackAmount, sectionAmount, rho, p0, p, c, 2);
 
-            final AtomicInteger updateGui = new AtomicInteger(-1);
-
             DrawActualStateRunnable drawRunable = new DrawActualStateRunnable(from, to,
                     trafficSimulator.getStreet(),
-                    trackAmount, canvasCarLayer.getGraphicsContext2D(), updateGui,
+                    trackAmount, canvasCarLayer.getGraphicsContext2D(),
                     LINE_WIDTH, PADDING, PIXEL_SIZE, canvasTest.getGraphicsContext2D());
 
 
-            SimulateTask simulateTask = new SimulateTask(iterations, trafficSimulator);
-
-            simulateTask.intProperty().addListener(new ChangeListener<Number>() {
-                @Override
-                public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                    //System.out.println("Iteration:" + newValue);
-                    if (updateGui.getAndSet(-1) == -1) {
-                        drawRunable.setIteration(newValue.intValue());
-                        Platform.runLater(drawRunable);
-                    }
-                }
-            });
-
+            SimulateTask simulateTask = this.initSimulateTask(iterations,trafficSimulator,drawRunable);
 
             initSimulationTab(trackAmount, from, to, iterations);
 
@@ -134,7 +120,17 @@ public class ViewController implements Initializable {
             workerThread.start();
         }
     }
-
+    private SimulateTask initSimulateTask(int iterations, TrafficSimulator simulator, DrawActualStateRunnable drawRunable) {
+        SimulateTask simulateTask = new SimulateTask(iterations, simulator);
+        simulateTask.intProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                drawRunable.setIteration(newValue.intValue());
+                Platform.runLater(drawRunable);
+            }
+        });
+        return simulateTask;
+    }
     private void initSimulationTab(int trackAmount, int from, int to, int iterations) {
         drawStreet(canvasStreetLayer.getGraphicsContext2D(), trackAmount, LINE_WIDTH, from, to);
         scrollPaneLeft.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
