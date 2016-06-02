@@ -4,18 +4,21 @@ import de.fhms.pvr.trafficsimulator.system.TrafficSimulator;
 import de.fhms.pvr.trafficsimulator.system.Vehicle;
 
 public class MovementSimulationTask extends AbstractSimulationTask {
-    public MovementSimulationTask(TrafficSimulator trafficSimulator, int lowerBound, int upperBound) {
-        super(trafficSimulator, lowerBound, upperBound);
+
+    private int currentIteration;
+
+    public MovementSimulationTask(Vehicle[][] street, int lowerBound, int upperBound, int currentIteration) {
+        super(street, lowerBound, upperBound);
+        this.currentIteration = currentIteration;
     }
 
     @Override
-    public Boolean call() throws Exception {
-        Vehicle[][] street = trafficSimulator.getStreet();
+    public Vehicle[][] call() throws Exception {
         Vehicle tmp;
-        int tmpSpeed, tmpIndex, iteration = trafficSimulator.getIteration();
+        int tmpSpeed, tmpIndex;
         for (int y = 0; y < street.length; y++) {
             for (int x = lowerBound; x <= upperBound; x++) {
-                if ((tmp = street[y][x]) != null && tmp.getMoveCount() < iteration) {
+                if ((tmp = street[y][x]) != null && tmp.getMoveCount() < currentIteration) {
                     if ((tmpSpeed = tmp.getCurrentSpeed()) > 0) {
                         tmpIndex = (x + tmpSpeed) % street[y].length;
                         street[y][x] = null;
@@ -25,6 +28,6 @@ public class MovementSimulationTask extends AbstractSimulationTask {
                 }
             }
         }
-        return true;
+        return street;
     }
 }

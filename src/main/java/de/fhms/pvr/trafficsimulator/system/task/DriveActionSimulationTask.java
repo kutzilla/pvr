@@ -11,20 +11,28 @@ public class DriveActionSimulationTask extends AbstractSimulationTask {
 
     private static final Logger LOG = LogManager.getLogger(DriveActionSimulationTask.class);
 
-    public DriveActionSimulationTask(TrafficSimulator trafficSimulator, int lowerBound, int upperBound) {
-        super(trafficSimulator, lowerBound, upperBound);
+    private static SplittableRandom randomGenerator = new SplittableRandom();
+
+    private double fastDawdleProbability;
+
+    private double slowDawdleProbability;
+
+    private double switchProbability;
+
+    public DriveActionSimulationTask(Vehicle[][] street, int lowerBound, int upperBound,
+                                     double fastDawdleProbability, double slowDawdleProbability,
+                                     double switchProbability) {
+        super(street, lowerBound, upperBound);
+        this.fastDawdleProbability = fastDawdleProbability;
+        this.slowDawdleProbability = slowDawdleProbability;
+        this.switchProbability = switchProbability;
     }
 
     @Override
-    public Boolean call() {
+    public Vehicle[][] call() {
         LOG.debug("Verarbeite von " + lowerBound + " bis " + upperBound);
         Vehicle tmp;
         int tmpCurrentSpeed, tmpIndex;
-        Vehicle[][] street = trafficSimulator.getStreet();
-        SplittableRandom randomGenerator = trafficSimulator.getRandomGenerator();
-        double fastDawdleProbability = trafficSimulator.getFastDawdleProbability();
-        double slowDawdleProbability = trafficSimulator.getSlowDawdleProbability();
-        double switchProbability = trafficSimulator.getSwitchProbability();
         int tmpSectionIndex, switchTrackIndex;
         boolean switchTrack;
         boolean dawdle;
@@ -92,11 +100,10 @@ public class DriveActionSimulationTask extends AbstractSimulationTask {
                 }
             }
         }
-        return true;
+        return street;
     }
 
     private boolean isSwitchToTrackPossible(int trackIndex, int sectionIndex, int currentSpeed) {
-        Vehicle[][] street = trafficSimulator.getStreet();
         int startIndex = sectionIndex - Vehicle.MAX_SPEED;
         if (startIndex < 0) {
             startIndex = street[0].length - startIndex - 1;

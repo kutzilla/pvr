@@ -18,24 +18,18 @@ public class CliApplication {
         double p = 0.2;
         double rho = 0.4;
         double c = 0.5;
-        int threadAmount = 2;
+        int workerAmount = 4;
+        int taskAmount = 4;
         TrafficSimulatorBuilder builder = new TrafficSimulatorBuilder(trackAmount, sectionAmount, rho);
         TrafficSimulator trafficSimulator = builder.withSlowDawdleProbability(p0)
-                                                .withFastDawdleProbability(p).withSwitchProbability(c).build();
+                .withFastDawdleProbability(p).withSwitchProbability(c)
+                .withWorkerAmount(workerAmount).withTaskAmount(taskAmount).build();
         for (int i = 0; i < 1000; i++) {
             trafficSimulator.iterate();
         }
-
-
-        LOG.info("Spur wechseln:\t" + trafficSimulator.getTimeMeasureController()
-                .getMeasuredTimeFor(TimeMeasureType.TRACK_SWITCHING) + "ms");
-        LOG.info("Beschleunigen:\t" + trafficSimulator.getTimeMeasureController()
-                .getMeasuredTimeFor(TimeMeasureType.ACCELERATION) + "ms");
-        LOG.info("Bremsen:\t\t" + trafficSimulator.getTimeMeasureController()
-                .getMeasuredTimeFor(TimeMeasureType.DECELERATION) + "ms");
-        LOG.info("Trödeln:\t\t" + trafficSimulator.getTimeMeasureController()
-                .getMeasuredTimeFor(TimeMeasureType.DAWDLING) + "ms");
-        LOG.info("Fortbewegen:\t" + trafficSimulator.getTimeMeasureController()
+        LOG.info("Aktionen:\t" + trafficSimulator.getTimeMeasureController()
+                .getMeasuredTimeFor(TimeMeasureType.DRIVE_ACTION) + "ms");
+        LOG.info("Bewegung:\t" + trafficSimulator.getTimeMeasureController()
                 .getMeasuredTimeFor(TimeMeasureType.MOVEMENT) + "ms");
         LOG.info("Iterationen:\t" + trafficSimulator.getTimeMeasureController()
                 .getMeasuredTimeFor(TimeMeasureType.ITERATION) + "ms");

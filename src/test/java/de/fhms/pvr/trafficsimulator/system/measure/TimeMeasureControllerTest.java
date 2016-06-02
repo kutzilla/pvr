@@ -17,18 +17,12 @@ public class TimeMeasureControllerTest {
     @Test
     public void testAllStopWatchesWorkingProperly() {
         this.timeMeasureController.startOrResume(ITERATION);
-        this.timeMeasureController.startOrResume(TRACK_SWITCHING);
-        this.timeMeasureController.startOrResume(ACCELERATION);
-        this.timeMeasureController.startOrResume(DECELERATION);
+        this.timeMeasureController.startOrResume(DRIVE_ACTION);
         this.timeMeasureController.startOrResume(MOVEMENT);
-        this.timeMeasureController.startOrResume(DAWDLING);
 
         this.timeMeasureController.suspend(ITERATION);
-        this.timeMeasureController.suspend(TRACK_SWITCHING);
-        this.timeMeasureController.suspend(ACCELERATION);
-        this.timeMeasureController.suspend(DECELERATION);
+        this.timeMeasureController.suspend(DRIVE_ACTION);
         this.timeMeasureController.suspend(MOVEMENT);
-        this.timeMeasureController.suspend(DAWDLING);
     }
 
     @Test

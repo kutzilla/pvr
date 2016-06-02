@@ -5,16 +5,16 @@ import de.fhms.pvr.trafficsimulator.system.Vehicle;
 
 import java.util.concurrent.Callable;
 
-public abstract class AbstractSimulationTask implements Callable<Boolean> {
+public abstract class AbstractSimulationTask implements Callable<Vehicle[][]> {
 
     protected int lowerBound;
 
     protected int upperBound;
 
-    protected TrafficSimulator trafficSimulator;
+    protected Vehicle[][] street;
 
-    public AbstractSimulationTask(TrafficSimulator trafficSimulator, int lowerBound, int upperBound) {
-        this.trafficSimulator = trafficSimulator;
+    public AbstractSimulationTask(Vehicle[][] street, int lowerBound, int upperBound) {
+        this.street = street;
         this.lowerBound = lowerBound;
         this.upperBound = upperBound;
     }
@@ -27,7 +27,7 @@ public abstract class AbstractSimulationTask implements Callable<Boolean> {
         return upperBound;
     }
 
-    public TrafficSimulator getTrafficSimulator() {
-        return trafficSimulator;
+    public Vehicle[][] getStreet() {
+        return street;
     }
 }

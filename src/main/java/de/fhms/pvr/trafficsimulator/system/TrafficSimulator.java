@@ -11,19 +11,17 @@ import java.util.SplittableRandom;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static de.fhms.pvr.trafficsimulator.system.measure.TimeMeasureType.DRIVE_ACTION;
 import static de.fhms.pvr.trafficsimulator.system.measure.TimeMeasureType.ITERATION;
+import static de.fhms.pvr.trafficsimulator.system.measure.TimeMeasureType.MOVEMENT;
 
 public class TrafficSimulator {
 
     private static final Logger LOG = LogManager.getLogger(TrafficSimulator.class);
 
-    private static int threadAmount = 1;
-
-    private static int taskAmount = 1;
+    private static final SplittableRandom randomGenerator = new SplittableRandom();
 
     volatile private Vehicle[][] street;
-
-    private SplittableRandom randomGenerator;
 
     private double fastDawdleProbability;
 
@@ -33,6 +31,10 @@ public class TrafficSimulator {
 
     private int iteration;
 
+    private int taskAmount;
+
+    private int workerAmount;
+
     private TimeMeasureController timeMeasureController;
 
     private ExecutorService executorService;
@@ -41,7 +43,8 @@ public class TrafficSimulator {
         this.switchProbability = builder.switchProbability;
         this.slowDawdleProbability = builder.slowDawdleProbability;
         this.fastDawdleProbability = builder.fastDawdleProbability;
-        this.randomGenerator = new SplittableRandom();
+        this.taskAmount = builder.taskAmount;
+        this.workerAmount = builder.workerAmount;
         this.timeMeasureController = new TimeMeasureController();
 
         if (builder.street != null) {
@@ -50,7 +53,7 @@ public class TrafficSimulator {
             createRandomStreet(builder.trackAmount, builder.sectionAmount, builder.vehicleDensity);
         }
     }
-    
+
     private void createRandomStreet(int trackAmount, int sectionAmount, double vehicleDensity) {
         street = new Vehicle[trackAmount][sectionAmount];
         int randomTrackIndex, randomSectionIndex;
@@ -84,15 +87,18 @@ public class TrafficSimulator {
         int index = 0;
         for (int i = 0; i < taskAmount; i++) {
             if (i < taskAmount - 1) {
-                tasks.add(new DriveActionSimulationTask(this, index, index + bound - 1));
+                tasks.add(new DriveActionSimulationTask(street, index, index + bound - 1, fastDawdleProbability,
+                        slowDawdleProbability, switchProbability));
                 LOG.debug("Task von " + index + " bis " + (index + bound - 1) + " angelegt");
             } else {
-                tasks.add(new DriveActionSimulationTask(this, index, street[0].length - 1));
+                tasks.add(new DriveActionSimulationTask(street, index, street[0].length - 1, fastDawdleProbability,
+                        slowDawdleProbability, switchProbability));
                 LOG.debug("Task von " + index + " bis " + (street[0].length - 1) + " angelegt");
             }
             index += bound;
         }
-        executorService = Executors.newFixedThreadPool(threadAmount);
+        executorService = Executors.newFixedThreadPool(workerAmount);
+        timeMeasureController.startOrResume(DRIVE_ACTION);
         try {
             executorService.invokeAll(tasks);
         } catch (InterruptedException e) {
@@ -100,6 +106,7 @@ public class TrafficSimulator {
         } finally {
             executorService.shutdown();
         }
+        timeMeasureController.suspend(DRIVE_ACTION);
     }
     
     protected void simulateMovement() {
@@ -112,15 +119,16 @@ public class TrafficSimulator {
         int index = 0;
         for (int i = 0; i < taskAmount; i++) {
             if (i < taskAmount - 1) {
-                tasks.add(new MovementSimulationTask(this, index, index + bound - 1));
+                tasks.add(new MovementSimulationTask(street, index, index + bound - 1, iteration));
                 LOG.debug("Task von " + index + " bis " + (index + bound - 1) + " angelegt");
             } else {
-                tasks.add(new MovementSimulationTask(this, index, street[0].length - 1));
+                tasks.add(new MovementSimulationTask(street, index, street[0].length - 1, iteration));
                 LOG.debug("Task von " + index + " bis " + (street[0].length - 1) + " angelegt");
             }
             index += bound;
         }
-        executorService = Executors.newFixedThreadPool(threadAmount);
+        executorService = Executors.newFixedThreadPool(workerAmount);
+        timeMeasureController.startOrResume(MOVEMENT);
         try {
             executorService.invokeAll(tasks);
         } catch (InterruptedException e) {
@@ -128,6 +136,7 @@ public class TrafficSimulator {
         } finally {
             executorService.shutdown();
         }
+        timeMeasureController.suspend(MOVEMENT);
     }
 
     public Vehicle[][] getStreet() {
@@ -138,28 +147,8 @@ public class TrafficSimulator {
         return timeMeasureController;
     }
 
-    public int getIteration() {
-        return iteration;
-    }
-
     protected void setIteration(int iteration) {
         this.iteration = iteration;
-    }
-
-    public SplittableRandom getRandomGenerator() {
-        return randomGenerator;
-    }
-
-    public double getFastDawdleProbability() {
-        return fastDawdleProbability;
-    }
-
-    public double getSlowDawdleProbability() {
-        return slowDawdleProbability;
-    }
-
-    public double getSwitchProbability() {
-        return switchProbability;
     }
 
     public static class TrafficSimulatorBuilder {

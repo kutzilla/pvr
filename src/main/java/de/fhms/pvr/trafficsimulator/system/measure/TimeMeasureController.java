@@ -48,14 +48,8 @@ public class TimeMeasureController {
         switch(type) {
             case ITERATION:
                 return iteration;
-            case ACCELERATION:
+            case DRIVE_ACTION:
                 return accelerationStopWatch;
-            case DECELERATION:
-                return decelerationStopWatch;
-            case DAWDLING:
-                return dawdlingStopWatch;
-            case TRACK_SWITCHING:
-                return trackSwitchingStopWatch;
             case MOVEMENT:
                 return movementStopWatch;
             default:
