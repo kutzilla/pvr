@@ -7,11 +7,11 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.SplittableRandom;
 
-public class ActionSimulationTask extends AbstractSimulationTask {
+public class DriveActionSimulationTask extends AbstractSimulationTask {
 
-    private static final Logger LOG = LogManager.getLogger(ActionSimulationTask.class);
+    private static final Logger LOG = LogManager.getLogger(DriveActionSimulationTask.class);
 
-    public ActionSimulationTask(TrafficSimulator trafficSimulator, int lowerBound, int upperBound) {
+    public DriveActionSimulationTask(TrafficSimulator trafficSimulator, int lowerBound, int upperBound) {
         super(trafficSimulator, lowerBound, upperBound);
     }
 

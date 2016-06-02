@@ -1,7 +1,7 @@
 package de.fhms.pvr.trafficsimulator.system;
 
 import de.fhms.pvr.trafficsimulator.system.measure.TimeMeasureController;
-import de.fhms.pvr.trafficsimulator.system.task.ActionSimulationTask;
+import de.fhms.pvr.trafficsimulator.system.task.DriveActionSimulationTask;
 import de.fhms.pvr.trafficsimulator.system.task.MovementSimulationTask;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -11,7 +11,6 @@ import java.util.SplittableRandom;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static de.fhms.pvr.trafficsimulator.system.measure.TimeMeasureType.DAWDLING;
 import static de.fhms.pvr.trafficsimulator.system.measure.TimeMeasureType.ITERATION;
 
 public class TrafficSimulator {
@@ -36,6 +35,8 @@ public class TrafficSimulator {
 
     private TimeMeasureController timeMeasureController;
 
+    private ExecutorService executorService;
+
     private TrafficSimulator(TrafficSimulatorBuilder builder) {
         this.switchProbability = builder.switchProbability;
         this.slowDawdleProbability = builder.slowDawdleProbability;
@@ -49,9 +50,7 @@ public class TrafficSimulator {
             createRandomStreet(builder.trackAmount, builder.sectionAmount, builder.vehicleDensity);
         }
     }
-
-    private ExecutorService executorService;
-
+    
     private void createRandomStreet(int trackAmount, int sectionAmount, double vehicleDensity) {
         street = new Vehicle[trackAmount][sectionAmount];
         int randomTrackIndex, randomSectionIndex;
@@ -70,13 +69,13 @@ public class TrafficSimulator {
     public void iterate() {
         timeMeasureController.startOrResume(ITERATION);
         this.iteration++;
-        simulateAcceleration();
+        simulateDriveAction();
         simulateMovement();
         timeMeasureController.suspend(ITERATION);
     }
 
-    protected void simulateAcceleration() {
-        ArrayList<ActionSimulationTask> tasks = new ArrayList<>();
+    protected void simulateDriveAction() {
+        ArrayList<DriveActionSimulationTask> tasks = new ArrayList<>();
         int bound;
         bound = street[0].length / taskAmount;
         if (street[0].length % taskAmount != 0) {
@@ -85,10 +84,10 @@ public class TrafficSimulator {
         int index = 0;
         for (int i = 0; i < taskAmount; i++) {
             if (i < taskAmount - 1) {
-                tasks.add(new ActionSimulationTask(this, index, index + bound - 1));
+                tasks.add(new DriveActionSimulationTask(this, index, index + bound - 1));
                 LOG.debug("Task von " + index + " bis " + (index + bound - 1) + " angelegt");
             } else {
-                tasks.add(new ActionSimulationTask(this, index, street[0].length - 1));
+                tasks.add(new DriveActionSimulationTask(this, index, street[0].length - 1));
                 LOG.debug("Task von " + index + " bis " + (street[0].length - 1) + " angelegt");
             }
             index += bound;
@@ -102,29 +101,7 @@ public class TrafficSimulator {
             executorService.shutdown();
         }
     }
-
-    protected void simulateDawdling() {
-        timeMeasureController.startOrResume(DAWDLING);
-        boolean dawdle;
-        int tmpCurrentSpeed;
-        Vehicle tmp;
-        for (int y = 0; y < street.length; y++) {
-            for (int x = 0; x < street[y].length; x++) {
-                if ((tmp = street[y][x]) != null && (tmpCurrentSpeed = tmp.getCurrentSpeed()) > 0) {
-                    if (tmpCurrentSpeed > 1) {
-                        dawdle = (((double) randomGenerator.nextInt(100)) / 100) <= fastDawdleProbability;
-                    } else {
-                        dawdle = (((double) randomGenerator.nextInt(100)) / 100) <= slowDawdleProbability;
-                    }
-                    if (dawdle) {
-                        tmp.decrementCurrentSpeed();
-                    }
-                }
-            }
-        }
-        timeMeasureController.suspend(DAWDLING);
-    }
-
+    
     protected void simulateMovement() {
         ArrayList<MovementSimulationTask> tasks = new ArrayList<>();
         int bound;

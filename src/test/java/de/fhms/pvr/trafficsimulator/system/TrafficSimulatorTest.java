@@ -1,8 +1,6 @@
 package de.fhms.pvr.trafficsimulator.system;
 
 import de.fhms.pvr.trafficsimulator.system.TrafficSimulator.TrafficSimulatorBuilder;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 
@@ -32,7 +30,7 @@ public class TrafficSimulatorTest {
         expectedStreet[0][9] = new Vehicle(5);
 
         trafficSimulator = new TrafficSimulatorBuilder(testStreet).build();
-        trafficSimulator.simulateAcceleration();
+        trafficSimulator.simulateDriveAction();
         assertArrayEquals(expectedStreet, trafficSimulator.getStreet());
     }
 
