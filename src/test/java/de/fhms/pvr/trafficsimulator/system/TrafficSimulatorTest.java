@@ -136,7 +136,6 @@ public class TrafficSimulatorTest {
         expectedStreet[1][1] = new Vehicle(2);
 
         trafficSimulator = new TrafficSimulatorBuilder(testStreet).withSwitchProbability(1.0).build();
-        trafficSimulator.setSwitchProbability(1.0);
         assertArrayEquals(expectedStreet, trafficSimulator.getStreet());
     }
 
@@ -153,7 +152,6 @@ public class TrafficSimulatorTest {
         expectedStreet[1][11] = new Vehicle(2);
 
         trafficSimulator = new TrafficSimulatorBuilder(testStreet).withSwitchProbability(1.0).build();
-        trafficSimulator.setSwitchProbability(1.0);
         assertArrayEquals(expectedStreet, trafficSimulator.getStreet());
     }
 
@@ -170,7 +168,6 @@ public class TrafficSimulatorTest {
         expectedStreet[0][5] = new Vehicle(1);
 
         trafficSimulator = new TrafficSimulatorBuilder(testStreet).withSwitchProbability(1.0).build();
-        trafficSimulator.setSwitchProbability(1.0);
         assertArrayEquals(expectedStreet, trafficSimulator.getStreet());
     }
 

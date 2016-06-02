@@ -3,8 +3,6 @@ package de.fhms.pvr.trafficsimulator.system;
 import de.fhms.pvr.trafficsimulator.system.measure.TimeMeasureController;
 import de.fhms.pvr.trafficsimulator.system.task.ActionSimulationTask;
 import de.fhms.pvr.trafficsimulator.system.task.MovementSimulationTask;
-import de.fhms.pvr.trafficsimulator.system.worker.AccelerateWorker;
-import de.fhms.pvr.trafficsimulator.system.worker.DecelerateWorker;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -13,7 +11,8 @@ import java.util.SplittableRandom;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static de.fhms.pvr.trafficsimulator.system.measure.TimeMeasureType.*;
+import static de.fhms.pvr.trafficsimulator.system.measure.TimeMeasureType.DAWDLING;
+import static de.fhms.pvr.trafficsimulator.system.measure.TimeMeasureType.ITERATION;
 
 public class TrafficSimulator {
 
@@ -168,22 +167,6 @@ public class TrafficSimulator {
 
     protected void setIteration(int iteration) {
         this.iteration = iteration;
-    }
-
-    protected void setStreet(Vehicle[][] street) {
-        this.street = street;
-    }
-
-    protected void setFastDawdleProbability(double fastDawdleProbability) {
-        this.fastDawdleProbability = fastDawdleProbability;
-    }
-
-    protected void setSlowDawdleProbability(double slowDawdleProbability) {
-        this.slowDawdleProbability = slowDawdleProbability;
-    }
-
-    protected void setSwitchProbability(double switchProbability) {
-        this.switchProbability = switchProbability;
     }
 
     public SplittableRandom getRandomGenerator() {
