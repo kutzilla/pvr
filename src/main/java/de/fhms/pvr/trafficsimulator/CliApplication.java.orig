@@ -18,10 +18,16 @@ public class CliApplication {
         double p = 0.2;
         double rho = 0.4;
         double c = 0.5;
+<<<<<<< HEAD
         int threadAmount = 2;
         TrafficSimulatorBuilder builder = new TrafficSimulatorBuilder(trackAmount, sectionAmount, rho);
         TrafficSimulator trafficSimulator = builder.withSlowDawdleProbability(p0)
                                                 .withFastDawdleProbability(p).withSwitchProbability(c).build();
+=======
+        TrafficSimulator.setThreadAmount(2);
+        TrafficSimulator.setTaskAmount(25);
+        TrafficSimulator trafficSimulator = new TrafficSimulator(trackAmount, sectionAmount, rho, p0, p, c);
+>>>>>>> feature_execution_service
         for (int i = 0; i < 1000; i++) {
             trafficSimulator.iterate();
         }
