@@ -34,7 +34,7 @@ public class ViewController implements Initializable {
     private final int PIXEL_SIZE = 12;
     private final double PADDING = 1.0;
     private final double LINE_WIDTH = 1.0;
-    private boolean isMoving = false;
+    private volatile boolean  isMoving = false;
 
     @FXML
     TabPane tabPaneRoot;
@@ -112,12 +112,12 @@ public class ViewController implements Initializable {
                     trackAmount, canvasCarLayer.getGraphicsContext2D(),
             LINE_WIDTH, PADDING, PIXEL_SIZE, canvasTest.getGraphicsContext2D());
 
-
             SimulateTask simulateTask = initSimulateTask(iterations,trafficSimulator,drawRunable);
 
             initSimulationTab(trackAmount, from, to, iterations);
 
             Thread workerThread = new Thread(simulateTask);
+            this.isMoving = true;
             workerThread.start();
         }
     }
@@ -202,8 +202,12 @@ public class ViewController implements Initializable {
         @Override
         protected Integer call() throws Exception {
             for (int i = 0; i < iterations; i++) {
-                simulator.iterate();
-                intProperty.set(intProperty.get() + 1);
+                if(isMoving) {
+                    simulator.iterate();
+                    intProperty.set(intProperty.get() + 1);
+                }else{
+                    break;
+                }
             }
             return null;
         }

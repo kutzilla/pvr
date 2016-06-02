@@ -42,6 +42,7 @@ public class TrafficSimulator {
     }
 
     private void createRandomStreet(int trackAmount, int sectionAmount, double vehicleDensity) {
+        street = new Vehicle[trackAmount][sectionAmount];
         int randomTrackIndex, randomSectionIndex;
         int vehicleCount = (int) ((double) trackAmount * sectionAmount * vehicleDensity);
         Vehicle tmp;
