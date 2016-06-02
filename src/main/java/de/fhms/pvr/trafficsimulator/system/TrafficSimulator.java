@@ -22,34 +22,28 @@ public class TrafficSimulator {
 
     private int iteration;
 
-    private int bound;
-
-    private int threadAmount;
+    private int workerAmount;
 
     private TimeMeasureController timeMeasureController;
 
-    protected TrafficSimulator(Vehicle[][] street) {
-        this.street = street;
-        this.iteration = 0;
+    private TrafficSimulator(TrafficSimulatorBuilder builder) {
+        this.switchProbability = builder.switchProbability;
+        this.slowDawdleProbability = builder.slowDawdleProbability;
+        this.fastDawdleProbability = builder.fastDawdleProbability;
         this.randomGenerator = new SplittableRandom();
         this.timeMeasureController = new TimeMeasureController();
-        this.threadAmount = 2;
-        this.bound = street[0].length / threadAmount;
+        this.workerAmount = 1;
+
+        if (builder.street != null) {
+            this.street = builder.street;
+        } else {
+            createRandomStreet(builder.trackAmount, builder.sectionAmount, builder.vehicleDensity);
+        }
     }
 
-    public TrafficSimulator(int trackAmount, int sectionAmount, double vehicleDensity,
-                            double slowDawdleProbability, double fastDawdleProbability, double switchProbability,
-                            int threadAmount) {
-        this.street = new Vehicle[trackAmount][sectionAmount];
-        this.timeMeasureController = new TimeMeasureController();
-        this.randomGenerator = new SplittableRandom();
-        this.slowDawdleProbability = slowDawdleProbability;
-        this.fastDawdleProbability = fastDawdleProbability;
-        this.switchProbability = switchProbability;
-        this.iteration = 0;
-        int vehicleCount = (int) ((double) trackAmount * sectionAmount * vehicleDensity);
-
+    private void createRandomStreet(int trackAmount, int sectionAmount, double vehicleDensity) {
         int randomTrackIndex, randomSectionIndex;
+        int vehicleCount = (int) ((double) trackAmount * sectionAmount * vehicleDensity);
         Vehicle tmp;
         for (int i = 0; i < vehicleCount; i++) {
             tmp = new Vehicle(randomGenerator.nextInt(Vehicle.MAX_SPEED + 1));
@@ -59,9 +53,6 @@ public class TrafficSimulator {
             } while (street[randomTrackIndex][randomSectionIndex] != null);
             street[randomTrackIndex][randomSectionIndex] = tmp;
         }
-
-        this.threadAmount = threadAmount;
-        this.bound = sectionAmount / threadAmount;
     }
 
     public void iterate() {
@@ -141,7 +132,8 @@ public class TrafficSimulator {
     }
 
     protected void simulateAcceleration() throws InterruptedException {
-        AccelerateWorker workers[] = new AccelerateWorker[threadAmount];
+        AccelerateWorker workers[] = new AccelerateWorker[workerAmount];
+        int bound = street[0].length / workerAmount;
         int index;
         for (int i = 0; i < workers.length; i++) {
             index = i * bound;
@@ -157,8 +149,8 @@ public class TrafficSimulator {
     }
 
     protected void simulateDeceleration() throws InterruptedException {
-        int index;
-        DecelerateWorker workers[] = new DecelerateWorker[threadAmount];
+        int index, bound = street[0].length / workerAmount;
+        DecelerateWorker workers[] = new DecelerateWorker[workerAmount];
         for (int i = 0; i < workers.length; i++) {
             index = i * bound;
             workers[i] = new DecelerateWorker(this.street, index, index + bound);
@@ -243,6 +235,75 @@ public class TrafficSimulator {
 
     protected void setSwitchProbability(double switchProbability) {
         this.switchProbability = switchProbability;
+    }
+
+    public static class TrafficSimulatorBuilder {
+
+        private int trackAmount;
+
+        private int sectionAmount;
+
+        private Vehicle[][] street;
+
+        private double switchProbability;
+
+        private double fastDawdleProbability;
+
+        private double slowDawdleProbability;
+
+        private double vehicleDensity;
+
+        private int workerAmount;
+
+        private int taskAmount;
+
+        public TrafficSimulatorBuilder(Vehicle[][] street) {
+            this.street = street;
+            this.workerAmount = 1;
+            this.taskAmount = 1;
+        }
+
+        public TrafficSimulatorBuilder(int trackAmount, int sectionAmount, double vehicleDensity) {
+            this.trackAmount = trackAmount;
+            this.sectionAmount = sectionAmount;
+            this.vehicleDensity = vehicleDensity;
+            this.workerAmount = 1;
+            this.taskAmount = 1;
+        }
+
+        public TrafficSimulatorBuilder withSwitchProbability(double switchProbability) {
+            this.switchProbability = switchProbability;
+            return this;
+        }
+
+        public TrafficSimulatorBuilder withFastDawdleProbability(double fastDawdleProbability) {
+            this.fastDawdleProbability = fastDawdleProbability;
+            return this;
+        }
+
+        public TrafficSimulatorBuilder withSlowDawdleProbability(double slowDawdleProbability) {
+            this.slowDawdleProbability = slowDawdleProbability;
+            return this;
+        }
+
+        public TrafficSimulatorBuilder withVehicleDensity(double vehicleDensity) {
+            this.vehicleDensity = vehicleDensity;
+            return this;
+        }
+
+        public TrafficSimulatorBuilder withWorkerAmount(int workerAmount) {
+            this.workerAmount = workerAmount;
+            return this;
+        }
+
+        public TrafficSimulatorBuilder withTaskAmount(int taskAmount) {
+            this.taskAmount = taskAmount;
+            return this;
+        }
+
+        public TrafficSimulator build() {
+            return new TrafficSimulator(this);
+        }
     }
 
 }

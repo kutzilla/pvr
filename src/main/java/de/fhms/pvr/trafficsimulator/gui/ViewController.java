@@ -2,6 +2,7 @@ package de.fhms.pvr.trafficsimulator.gui;
 
 
 import de.fhms.pvr.trafficsimulator.system.TrafficSimulator;
+import de.fhms.pvr.trafficsimulator.system.TrafficSimulator.TrafficSimulatorBuilder;
 import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -103,7 +104,8 @@ public class ViewController implements Initializable {
             int from = Integer.parseInt(txtFrom.getText());
             int to = Integer.parseInt(txtTo.getText());
 
-            TrafficSimulator trafficSimulator = new TrafficSimulator(trackAmount, sectionAmount, rho, p0, p, c, 2);
+            TrafficSimulator trafficSimulator = new TrafficSimulatorBuilder(trackAmount, sectionAmount, rho)
+                    .withSwitchProbability(c).withSlowDawdleProbability(p0).withFastDawdleProbability(p).build();
 
             DrawActualStateRunnable drawRunable = new DrawActualStateRunnable(from, to,
                     trafficSimulator.getStreet(),

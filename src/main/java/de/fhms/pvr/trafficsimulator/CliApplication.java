@@ -2,6 +2,7 @@ package de.fhms.pvr.trafficsimulator;
 
 
 import de.fhms.pvr.trafficsimulator.system.TrafficSimulator;
+import de.fhms.pvr.trafficsimulator.system.TrafficSimulator.TrafficSimulatorBuilder;
 import de.fhms.pvr.trafficsimulator.system.measure.TimeMeasureType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,7 +19,9 @@ public class CliApplication {
         double rho = 0.4;
         double c = 0.5;
         int threadAmount = 2;
-        TrafficSimulator trafficSimulator = new TrafficSimulator(trackAmount, sectionAmount, rho, p0, p, c, threadAmount);
+        TrafficSimulatorBuilder builder = new TrafficSimulatorBuilder(trackAmount, sectionAmount, rho);
+        TrafficSimulator trafficSimulator = builder.withSlowDawdleProbability(p0)
+                                                .withFastDawdleProbability(p).withSwitchProbability(c).build();
         for (int i = 0; i < 1000; i++) {
             trafficSimulator.iterate();
         }
