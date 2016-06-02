@@ -103,7 +103,9 @@ public class ViewController implements Initializable {
             int from = Integer.parseInt(txtFrom.getText());
             int to = Integer.parseInt(txtTo.getText());
 
-            TrafficSimulator trafficSimulator = new TrafficSimulator(trackAmount, sectionAmount, rho, p0, p, c, 2);
+            TrafficSimulator.setTaskAmount(50);
+            TrafficSimulator.setThreadAmount(4);
+            TrafficSimulator trafficSimulator = new TrafficSimulator(trackAmount, sectionAmount, rho, p0, p, c);
 
             DrawActualStateRunnable drawRunable = new DrawActualStateRunnable(from, to,
                     trafficSimulator.getStreet(),

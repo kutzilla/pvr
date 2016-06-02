@@ -11,14 +11,15 @@ public class CliApplication {
     private static final Logger LOG = LogManager.getLogger(CliApplication.class);
 
     public static void main(String[] args) {
-        int trackAmount = 4;
+        int trackAmount = 2;
         int sectionAmount = 1000;
         double p0 = 0.2;
         double p = 0.2;
         double rho = 0.4;
         double c = 0.5;
-        int threadAmount = 2;
-        TrafficSimulator trafficSimulator = new TrafficSimulator(trackAmount, sectionAmount, rho, p0, p, c, threadAmount);
+        TrafficSimulator.setThreadAmount(2);
+        TrafficSimulator.setTaskAmount(25);
+        TrafficSimulator trafficSimulator = new TrafficSimulator(trackAmount, sectionAmount, rho, p0, p, c);
         for (int i = 0; i < 1000; i++) {
             trafficSimulator.iterate();
         }
@@ -34,7 +35,7 @@ public class CliApplication {
                 .getMeasuredTimeFor(TimeMeasureType.DAWDLING) + "ms");
         LOG.info("Fortbewegen:\t" + trafficSimulator.getTimeMeasureController()
                 .getMeasuredTimeFor(TimeMeasureType.MOVEMENT) + "ms");
-        LOG.info("\r\nIterationen:\t" + trafficSimulator.getTimeMeasureController()
+        LOG.info("Iterationen:\t" + trafficSimulator.getTimeMeasureController()
                 .getMeasuredTimeFor(TimeMeasureType.ITERATION) + "ms");
     }
 

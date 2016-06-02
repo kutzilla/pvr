@@ -1,5 +1,6 @@
 package de.fhms.pvr.trafficsimulator.system;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -11,6 +12,12 @@ public class TrafficSimulatorTest {
     private Vehicle[][] expectedStreet;
 
     private TrafficSimulator trafficSimulator;
+
+    @Before
+    public void setUp() {
+        TrafficSimulator.setThreadAmount(2);
+        TrafficSimulator.setTaskAmount(5);
+    }
 
     @Test
     public void testSimulateAcceleration() throws Exception {
