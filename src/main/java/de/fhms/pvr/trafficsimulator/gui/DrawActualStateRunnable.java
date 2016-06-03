@@ -48,7 +48,7 @@ public class DrawActualStateRunnable implements Runnable {
         for (int i = 0; i < trackAmount; i++) {
             xGraph = 0;
             x = 0;
-            for (int k = to; k > from; k--) {
+            for (int k = from; k <= to; k++) {
                 v = street[i][k];
                 gcCarCanvas.setFill(Color.DARKGRAY);
                 gcGraph.setFill(Color.BLACK);

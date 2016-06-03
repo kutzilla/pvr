@@ -16,6 +16,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -90,6 +91,12 @@ public class ViewController implements Initializable {
     @FXML
     ScrollPane scrollPaneLeft;
 
+    @FXML
+    TextField txtWorkerAmount;
+
+    @FXML
+    TextField txtTaskAmount;
+
 
     public void startSimulation(Event event) {
         if (validateInputFields()) {
@@ -103,10 +110,12 @@ public class ViewController implements Initializable {
             int iterations = Integer.parseInt(txtIterations.getText());
             int from = Integer.parseInt(txtFrom.getText());
             int to = Integer.parseInt(txtTo.getText());
+            int taskAmount = Integer.parseInt(txtTaskAmount.getText());
+            int workerAmount = Integer.parseInt(txtWorkerAmount.getText());
 
             TrafficSimulator trafficSimulator = new TrafficSimulatorBuilder(trackAmount, sectionAmount, rho)
                     .withSwitchProbability(c).withSlowDawdleProbability(p0).withFastDawdleProbability(p)
-                    .withWorkerAmount(4).withTaskAmount(4).build();
+                    .withWorkerAmount(workerAmount).withTaskAmount(taskAmount).build();
 
             DrawActualStateRunnable drawRunable = new DrawActualStateRunnable(from, to,
                     trafficSimulator.getStreet(),
@@ -124,13 +133,13 @@ public class ViewController implements Initializable {
     }
     private SimulateTask initSimulateTask(int iterations, TrafficSimulator simulator, DrawActualStateRunnable drawRunable) {
         SimulateTask simulateTask = new SimulateTask(iterations, simulator);
-        simulateTask.intProperty().addListener(new ChangeListener<Number>() {
+        /**simulateTask.intProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 drawRunable.setIteration(newValue.intValue());
                 Platform.runLater(drawRunable);
             }
-        });
+        });*/
         return simulateTask;
     }
     private void initSimulationTab(int trackAmount, int from, int to, int iterations) {
@@ -174,6 +183,8 @@ public class ViewController implements Initializable {
         txtIterations.setText("1000");
         txtFrom.setText("0");
         txtTo.setText("100");
+        txtWorkerAmount.setText("1");
+        txtTaskAmount.setText("1");
     }
 
     /**
@@ -277,7 +288,9 @@ public class ViewController implements Initializable {
                 && isNumeric(txtSwitchProb.getText())
                 && isNumeric(txtSectionAmount.getText())
                 && isNumeric(txtFrom.getText())
-                && isNumeric(txtTo.getText())) {
+                && isNumeric(txtTo.getText())
+                && isNumeric(txtWorkerAmount.getText())
+                && isNumeric(txtTaskAmount.getText())) {
             return true;
         }
         return false;

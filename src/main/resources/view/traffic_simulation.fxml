@@ -14,15 +14,17 @@
               <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <TextField fx:id="txtTracks" layoutX="155.0" layoutY="64.0" prefHeight="25.0" prefWidth="60.0" />
-                        <TextField fx:id="txtIterations" layoutX="155.0" layoutY="98.0" prefHeight="25.0" prefWidth="60.0" />
-                        <TextField fx:id="txtSectionAmount" layoutX="155.0" layoutY="131.0" prefHeight="25.0" prefWidth="60.0" />
-                        <TextField fx:id="txtP" layoutX="155.0" layoutY="165.0" prefHeight="25.0" prefWidth="60.0" />
-                        <TextField fx:id="txtP0" layoutX="155.0" layoutY="202.0" prefHeight="25.0" prefWidth="60.0" />
-                        <TextField fx:id="txtRho" layoutX="155.0" layoutY="239.0" prefHeight="25.0" prefWidth="60.0" />
-                        <TextField fx:id="txtSwitchProb" layoutX="155.0" layoutY="276.0" prefHeight="25.0" prefWidth="60.0" />
-                        <TextField fx:id="txtFrom" layoutX="287.0" layoutY="64.0" prefHeight="25.0" prefWidth="54.0" />
-                        <TextField fx:id="txtTo" layoutX="400.0" layoutY="64.0" prefHeight="25.0" prefWidth="48.0" />
+                        <TextField fx:id="txtTracks" layoutX="155.0" layoutY="64.0" prefHeight="25.0" prefWidth="90.0" />
+                        <TextField fx:id="txtIterations" layoutX="155.0" layoutY="98.0" prefHeight="25.0" prefWidth="90.0" />
+                        <TextField fx:id="txtSectionAmount" layoutX="155.0" layoutY="131.0" prefHeight="25.0" prefWidth="90.0" />
+                        <TextField fx:id="txtP" layoutX="155.0" layoutY="165.0" prefHeight="25.0" prefWidth="90.0" />
+                        <TextField fx:id="txtP0" layoutX="155.0" layoutY="202.0" prefHeight="25.0" prefWidth="90.0" />
+                        <TextField fx:id="txtRho" layoutX="155.0" layoutY="239.0" prefHeight="25.0" prefWidth="90.0" />
+                        <TextField fx:id="txtSwitchProb" layoutX="155.0" layoutY="276.0" prefHeight="25.0" prefWidth="90.0" />
+                        <TextField fx:id="txtFrom" layoutX="353.0" layoutY="64.0" prefHeight="25.0" prefWidth="54.0" />
+                        <TextField fx:id="txtTo" layoutX="487.0" layoutY="64.0" prefHeight="25.0" prefWidth="54.0" />
+                        <TextField fx:id="txtWorkerAmount" layoutX="353.0" layoutY="98.0" prefHeight="25.0" prefWidth="54.0" />
+                        <TextField fx:id="txtTaskAmount" layoutX="487.0" layoutY="98.0" prefHeight="25.0" prefWidth="54.0" />
                         <Label layoutX="84.0" layoutY="27.0" text="Config" />
                         <Label layoutX="14.0" layoutY="68.0" text="Anz. Spuren:" />
                         <Label layoutX="14.0" layoutY="102.0" text="Anz. Iterationen:" />
@@ -32,8 +34,10 @@
                         <Label layoutX="13.0" layoutY="280.0" text="Spurwechselwahrsch.:" />
                         <Label layoutX="14.0" layoutY="135.0" text="Anz. Spurenabschnitte:" />
                         <Button fx:id="btnDefault" layoutX="14.0" layoutY="325.0" mnemonicParsing="false" onAction="#resetToDefault" text="default" />
-                        <Label layoutX="251.0" layoutY="68.0" text="von:" />
-                        <Label layoutX="363.0" layoutY="68.0" text="bis:" />
+                        <Label layoutX="278.0" layoutY="68.0" text="von:" />
+                        <Label layoutX="424.0" layoutY="68.0" text="bis:" />
+                        <Label layoutX="278.0" layoutY="102.0" text="Anz. Worker:" />
+                        <Label layoutX="424.0" layoutY="102.0" text="Anz. Tasks:" />
                      </children>
                   </AnchorPane>
               </content>
