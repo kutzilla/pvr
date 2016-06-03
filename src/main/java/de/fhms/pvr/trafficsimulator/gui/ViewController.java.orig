@@ -118,7 +118,11 @@ public class ViewController implements Initializable {
 
             TrafficSimulator trafficSimulator = new TrafficSimulatorBuilder(trackAmount, sectionAmount, rho)
                     .withSwitchProbability(c).withSlowDawdleProbability(p0).withFastDawdleProbability(p)
+<<<<<<< HEAD
                     .withWorkerAmount(workerAmount).withTaskAmount(taskAmount).build();
+=======
+                    .withWorkerAmount(2).withTaskAmount(2).build();
+>>>>>>> develop
 
             DrawActualStateRunnable drawRunable = new DrawActualStateRunnable(from, to,
                     trafficSimulator.getStreet(),

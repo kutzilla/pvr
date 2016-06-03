@@ -29,7 +29,7 @@ public class DriveActionSimulationTask extends AbstractSimulationTask {
     }
 
     @Override
-    public Vehicle[][] call() {
+    public Void call() {
         LOG.debug("Verarbeite von " + lowerBound + " bis " + upperBound);
         Vehicle tmp;
         int tmpCurrentSpeed, tmpIndex;
@@ -100,7 +100,7 @@ public class DriveActionSimulationTask extends AbstractSimulationTask {
                 }
             }
         }
-        return street;
+        return null;
     }
 
     private boolean isSwitchToTrackPossible(int trackIndex, int sectionIndex, int currentSpeed) {
