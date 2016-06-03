@@ -106,7 +106,7 @@ public class ViewController implements Initializable {
 
             TrafficSimulator trafficSimulator = new TrafficSimulatorBuilder(trackAmount, sectionAmount, rho)
                     .withSwitchProbability(c).withSlowDawdleProbability(p0).withFastDawdleProbability(p)
-                    .withWorkerAmount(4).withTaskAmount(4).build();
+                    .withWorkerAmount(2).withTaskAmount(2).build();
 
             DrawActualStateRunnable drawRunable = new DrawActualStateRunnable(from, to,
                     trafficSimulator.getStreet(),
@@ -219,6 +219,7 @@ public class ViewController implements Initializable {
             LOG.info("Aktionen:\t\t" + simulator.getTimeMeasureController().getMeasuredTimeFor(DRIVE_ACTION) + "ms");
             LOG.info("Fortbewegen:\t" + simulator.getTimeMeasureController().getMeasuredTimeFor(MOVEMENT) + "ms");
             LOG.info("Gesamt:\t\t" + simulator.getTimeMeasureController().getMeasuredTimeFor(ITERATION) + "ms");
+            simulator.shutdown();
         }
     }
 

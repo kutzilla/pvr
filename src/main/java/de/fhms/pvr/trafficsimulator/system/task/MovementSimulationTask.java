@@ -7,13 +7,13 @@ public class MovementSimulationTask extends AbstractSimulationTask {
 
     private int currentIteration;
 
-    public MovementSimulationTask(Vehicle[][] street, int lowerBound, int upperBound, int currentIteration) {
+    public MovementSimulationTask(Vehicle[][] street, int lowerBound, int upperBound) {
         super(street, lowerBound, upperBound);
-        this.currentIteration = currentIteration;
+        this.currentIteration = 0;
     }
 
     @Override
-    public Vehicle[][] call() throws Exception {
+    public Void call() throws Exception {
         Vehicle tmp;
         int tmpSpeed, tmpIndex;
         for (int y = 0; y < street.length; y++) {
@@ -28,6 +28,7 @@ public class MovementSimulationTask extends AbstractSimulationTask {
                 }
             }
         }
-        return street;
+        currentIteration++;
+        return null;
     }
 }

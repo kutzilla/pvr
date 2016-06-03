@@ -18,8 +18,8 @@ public class CliApplication {
         double p = 0.2;
         double rho = 0.4;
         double c = 0.5;
-        int workerAmount = 4;
-        int taskAmount = 4;
+        int workerAmount = 2;
+        int taskAmount = 2;
         TrafficSimulatorBuilder builder = new TrafficSimulatorBuilder(trackAmount, sectionAmount, rho);
         TrafficSimulator trafficSimulator = builder.withSlowDawdleProbability(p0)
                 .withFastDawdleProbability(p).withSwitchProbability(c)
@@ -33,6 +33,7 @@ public class CliApplication {
                 .getMeasuredTimeFor(TimeMeasureType.MOVEMENT) + "ms");
         LOG.info("Iterationen:\t" + trafficSimulator.getTimeMeasureController()
                 .getMeasuredTimeFor(TimeMeasureType.ITERATION) + "ms");
+        trafficSimulator.shutdown();
     }
 
 }
