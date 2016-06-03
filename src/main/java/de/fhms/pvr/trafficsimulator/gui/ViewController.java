@@ -97,6 +97,9 @@ public class ViewController implements Initializable {
     @FXML
     TextField txtTaskAmount;
 
+    @FXML
+    Button btnStartSimulation;
+
 
     public void startSimulation(Event event) {
         if (validateInputFields()) {
@@ -129,17 +132,18 @@ public class ViewController implements Initializable {
             Thread workerThread = new Thread(simulateTask);
             this.isMoving = true;
             workerThread.start();
+            this.enableOrDeactivateStart();
         }
     }
     private SimulateTask initSimulateTask(int iterations, TrafficSimulator simulator, DrawActualStateRunnable drawRunable) {
         SimulateTask simulateTask = new SimulateTask(iterations, simulator);
-        /**simulateTask.intProperty().addListener(new ChangeListener<Number>() {
+        simulateTask.intProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 drawRunable.setIteration(newValue.intValue());
                 Platform.runLater(drawRunable);
             }
-        });*/
+        });
         return simulateTask;
     }
     private void initSimulationTab(int trackAmount, int from, int to, int iterations) {
@@ -149,6 +153,14 @@ public class ViewController implements Initializable {
         scrollPaneLeft.setContent(canvasTest);
         lblLiveFrom.setText(String.valueOf(from));
         lblLiveTo.setText(String.valueOf(to));
+    }
+
+    private void enableOrDeactivateStart(){
+        if(btnStartSimulation.isDisable()) {
+            btnStartSimulation.setDisable(false);
+            return;
+        }
+        btnStartSimulation.setDisable(true);
     }
 
 
@@ -227,6 +239,7 @@ public class ViewController implements Initializable {
         @Override
         protected void succeeded() {
             super.succeeded();
+            enableOrDeactivateStart();
             LOG.info("Aktionen:\t\t" + simulator.getTimeMeasureController().getMeasuredTimeFor(DRIVE_ACTION) + "ms");
             LOG.info("Fortbewegen:\t" + simulator.getTimeMeasureController().getMeasuredTimeFor(MOVEMENT) + "ms");
             LOG.info("Gesamt:\t\t" + simulator.getTimeMeasureController().getMeasuredTimeFor(ITERATION) + "ms");
