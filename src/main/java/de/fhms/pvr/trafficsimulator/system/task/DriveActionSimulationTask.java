@@ -19,10 +19,10 @@ public class DriveActionSimulationTask extends AbstractSimulationTask {
 
     private double switchProbability;
 
-    public DriveActionSimulationTask(Vehicle[][] street, int lowerBound, int upperBound,
+    public DriveActionSimulationTask(Vehicle[][] street, int lowerBorder, int upperBorder,
                                      double fastDawdleProbability, double slowDawdleProbability,
                                      double switchProbability) {
-        super(street, lowerBound, upperBound);
+        super(street, lowerBorder, upperBorder);
         this.fastDawdleProbability = fastDawdleProbability;
         this.slowDawdleProbability = slowDawdleProbability;
         this.switchProbability = switchProbability;

@@ -7,8 +7,8 @@ public class MovementSimulationTask extends AbstractSimulationTask {
 
     private int currentIteration;
 
-    public MovementSimulationTask(Vehicle[][] street, int lowerBound, int upperBound) {
-        super(street, lowerBound, upperBound);
+    public MovementSimulationTask(Vehicle[][] street, int lowerBorder, int upperBorder) {
+        super(street, lowerBorder, upperBorder);
         this.currentIteration = 0;
     }
 
