@@ -13,9 +13,10 @@ public class MovementSimulationTask extends AbstractSimulationTask {
     }
 
     @Override
-    public Void call() throws Exception {
+    public Void call() {
         Vehicle tmp;
         int tmpSpeed, tmpIndex;
+        currentIteration++;
         for (int y = 0; y < street.length; y++) {
             for (int x = lowerBound; x <= upperBound; x++) {
                 if ((tmp = street[y][x]) != null && tmp.getMoveCount() < currentIteration) {
@@ -28,7 +29,6 @@ public class MovementSimulationTask extends AbstractSimulationTask {
                 }
             }
         }
-        currentIteration++;
         return null;
     }
 }
