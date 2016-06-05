@@ -58,6 +58,7 @@ public class DriveActionSimulationTask extends AbstractSimulationTask {
                         if (switchTrack) {
                             street[y][x] = null;
                             street[switchTrackIndex][x] = tmp;
+                            LOG.debug(tmp + " wechselt von " + y + " auf die Spur " + switchTrackIndex);
                         }
                     }
                 }
@@ -103,6 +104,7 @@ public class DriveActionSimulationTask extends AbstractSimulationTask {
             }
             if (dawdle) {
                 tmp.decrementCurrentSpeed();
+                LOG.debug(tmp + " trödelt");
             }
         }
     }
