@@ -90,7 +90,6 @@ public class TrafficSimulatorTest {
         expectedStreet[0][2] = new Vehicle(3);
 
         trafficSimulator = new TrafficSimulatorBuilder(testStreet).build();
-        trafficSimulator.setIteration(1);
         trafficSimulator.simulateMovement();
         assertArrayEquals(expectedStreet, trafficSimulator.getStreet());
     }
@@ -111,7 +110,6 @@ public class TrafficSimulatorTest {
 
         trafficSimulator = new TrafficSimulatorBuilder(testStreet)
                 .withWorkerAmount(2).withTaskAmount(2).build();
-        trafficSimulator.setIteration(1);
         trafficSimulator.simulateMovement();
         assertArrayEquals(expectedStreet, trafficSimulator.getStreet());
     }
@@ -132,7 +130,6 @@ public class TrafficSimulatorTest {
 
         trafficSimulator = new TrafficSimulatorBuilder(testStreet)
                 .withWorkerAmount(2).withTaskAmount(3).build();
-        trafficSimulator.setIteration(1);
         trafficSimulator.simulateMovement();
         assertArrayEquals(expectedStreet, trafficSimulator.getStreet());
     }

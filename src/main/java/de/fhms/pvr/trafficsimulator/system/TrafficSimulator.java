@@ -33,8 +33,6 @@ public class TrafficSimulator {
 
     private double switchProbability;
 
-    private int iteration;
-
     private TimeMeasureController timeMeasureController;
 
     private ExecutorService executorService;
@@ -99,7 +97,6 @@ public class TrafficSimulator {
 
     public void iterate() {
         timeMeasureController.startOrResume(ITERATION);
-        this.iteration++;
         simulateDriveAction();
         simulateMovement();
         timeMeasureController.suspend(ITERATION);
@@ -139,9 +136,6 @@ public class TrafficSimulator {
         return timeMeasureController;
     }
 
-    protected void setIteration(int iteration) {
-        this.iteration = iteration;
-    }
 
     public static class TrafficSimulatorBuilder {
 
