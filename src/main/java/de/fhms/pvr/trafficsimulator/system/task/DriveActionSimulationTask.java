@@ -28,75 +28,98 @@ public class DriveActionSimulationTask extends AbstractSimulationTask {
         this.switchProbability = switchProbability;
     }
 
+    protected void simulateTrackSwitching(int x, int y) {
+        Vehicle tmp = street[y][x];
+        int tmpSectionIndex, switchTrackIndex;
+        boolean switchTrack;
+        if (tmp != null) {
+            // Prüfung der Fahrzeuge auf der eigenen Spur
+            for (int i = 1; i <= tmp.getCurrentSpeed() + 1; i++) {
+                tmpSectionIndex = (x + i) % street[y].length;
+                // Blockierendes Fahrzeug befindet sich auf der eignen Spur
+                if (street[y][tmpSectionIndex] != null) {
+                    // Reset von Wechselspur
+                    switchTrackIndex = -1;
+                    // Prüfung der Spur oberhalb
+                    if (y > 0 && isSwitchToTrackPossible(y - 1, x, tmp.getCurrentSpeed())) {
+                        switchTrackIndex = y - 1;
+                    }
+                    // Prüfung der Spur unterhalb und ein Wechsel
+                    // oberhalb nicht bereits möglich wäre
+                    if (y < street.length - 1 && switchTrackIndex < 0 &&
+                            isSwitchToTrackPossible(y + 1, x, tmp.getCurrentSpeed())) {
+                        switchTrackIndex = y + 1;
+                    }
+
+                    // Wechsel möglich
+                    if (switchTrackIndex >= 0) {
+                        switchTrack = (((double) randomGenerator.nextInt(100)) / 100) <= switchProbability;
+                        // Ausführung des Wechsels
+                        if (switchTrack) {
+                            street[y][x] = null;
+                            street[switchTrackIndex][x] = tmp;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    protected void simulateAcceleration(int x, int y) {
+        Vehicle v;
+        if ((v = street[y][x]) != null) {
+            v.incrementCurrentSpeed();
+            LOG.debug("Geschwindigkeit von " + v + " erhöht");
+        }
+    }
+
+    protected void simulateDeceleration(int x, int y) {
+        Vehicle tmp;
+        int tmpCurrentSpeed, tmpIndex;
+        if ((tmp  = street[y][x]) != null) {
+            tmpCurrentSpeed = tmp.getCurrentSpeed();
+            if (tmpCurrentSpeed > 0) {
+                for (int i = 1; i <= tmp.getCurrentSpeed(); i++) {
+                    tmpIndex = (x + i) % street[y].length;
+                    if (street[y][tmpIndex] != null) {
+                        tmp.setCurrentSpeed(i - 1);
+                        LOG.debug("Geschwindigkeit von " + tmp + " um " + (i - 1) + " verringert");
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    protected void simulateDawdling(int x, int y) {
+        Vehicle tmp;
+        int tmpCurrentSpeed;
+        boolean dawdle;
+        if ((tmp = street[y][x]) != null && (tmpCurrentSpeed = tmp.getCurrentSpeed()) > 0) {
+            if (tmpCurrentSpeed > 1) {
+                dawdle = (((double) randomGenerator.nextInt(100)) / 100) <= fastDawdleProbability;
+            } else {
+                dawdle = (((double) randomGenerator.nextInt(100)) / 100) <= slowDawdleProbability;
+            }
+            if (dawdle) {
+                tmp.decrementCurrentSpeed();
+            }
+        }
+    }
+
     @Override
     public Void call() {
         LOG.debug("Verarbeite von " + lowerBound + " bis " + upperBound);
-        Vehicle tmp;
-        int tmpCurrentSpeed, tmpIndex;
-        int tmpSectionIndex, switchTrackIndex;
-        boolean switchTrack;
-        boolean dawdle;
+
         for (int y = 0; y < street.length; y++) {
             for (int x = lowerBound; x <= upperBound; x++) {
-                tmp = street[y][x];
-                if (tmp != null) {
-                    // Prüfung der Fahrzeuge auf der eigenen Spur
-                    for (int i = 1; i <= tmp.getCurrentSpeed() + 1; i++) {
-                        tmpSectionIndex = (x + i) % street[y].length;
-                        // Blockierendes Fahrzeug befindet sich auf der eignen Spur
-                        if (street[y][tmpSectionIndex] != null) {
-                            // Reset von Wechselspur
-                            switchTrackIndex = -1;
-                            // Prüfung der Spur oberhalb
-                            if (y > 0 && isSwitchToTrackPossible(y - 1, x, tmp.getCurrentSpeed())) {
-                                switchTrackIndex = y - 1;
-                            }
-                            // Prüfung der Spur unterhalb und ein Wechsel
-                            // oberhalb nicht bereits möglich wäre
-                            if (y < street.length - 1 && switchTrackIndex < 0 &&
-                                    isSwitchToTrackPossible(y + 1, x, tmp.getCurrentSpeed())) {
-                                switchTrackIndex = y + 1;
-                            }
-
-                            // Wechsel möglich
-                            if (switchTrackIndex >= 0) {
-                                switchTrack = (((double) randomGenerator.nextInt(100)) / 100) <= switchProbability;
-                                // Ausführung des Wechsels
-                                if (switchTrack) {
-                                    street[y][x] = null;
-                                    street[switchTrackIndex][x] = tmp;
-                                }
-                            }
-                        }
+                if (street[y][x] != null) {
+                    if (street.length > 1) {
+                        simulateTrackSwitching(x, y);
                     }
-                }
-
-                if (tmp != null) {
-                    tmp.incrementCurrentSpeed();
-                    LOG.debug("Geschwindigkeit von " + tmp + " erhöht");
-                }
-                if (tmp != null) {
-                    tmpCurrentSpeed = tmp.getCurrentSpeed();
-                    if (tmpCurrentSpeed > 0) {
-                        for (int i = 1; i <= tmp.getCurrentSpeed(); i++) {
-                            tmpIndex = (x + i) % street[y].length;
-                            if (street[y][tmpIndex] != null) {
-                                tmp.setCurrentSpeed(i - 1);
-                                LOG.debug("Geschwindigkeit von " + tmp + " um " + (i - 1) + " verringert");
-                                break;
-                            }
-                        }
-                    }
-                }
-                if ((tmp = street[y][x]) != null && (tmpCurrentSpeed = tmp.getCurrentSpeed()) > 0) {
-                    if (tmpCurrentSpeed > 1) {
-                        dawdle = (((double) randomGenerator.nextInt(100)) / 100) <= fastDawdleProbability;
-                    } else {
-                        dawdle = (((double) randomGenerator.nextInt(100)) / 100) <= slowDawdleProbability;
-                    }
-                    if (dawdle) {
-                        tmp.decrementCurrentSpeed();
-                    }
+                    simulateAcceleration(x, y);
+                    simulateDeceleration(x, y);
+                    simulateDawdling(x, y);
                 }
             }
         }
