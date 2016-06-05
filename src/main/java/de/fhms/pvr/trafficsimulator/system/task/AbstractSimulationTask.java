@@ -22,19 +22,6 @@ public abstract class AbstractSimulationTask implements Callable<Void> {
         this.bound = upperBorder - lowerBorder;
     }
 
-    public int getLowerBound() {
-        return lowerBound;
-    }
-
-    public int getUpperBound() {
-        return upperBound;
-    }
-
-
-    public int getBound() {
-        return bound;
-    }
-
     public Vehicle[][] getStreet() {
         return street;
     }
