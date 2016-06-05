@@ -1,6 +1,5 @@
 package de.fhms.pvr.trafficsimulator.system.task;
 
-import de.fhms.pvr.trafficsimulator.system.TrafficSimulator;
 import de.fhms.pvr.trafficsimulator.system.Vehicle;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -111,10 +110,10 @@ public class DriveActionSimulationTask extends AbstractSimulationTask {
 
     @Override
     public Void call() {
-        LOG.debug("Verarbeite von " + lowerBound + " bis " + upperBound);
+        LOG.debug("Verarbeite von " + lowerBorder + " bis " + upperBorder);
 
         for (int y = 0; y < street.length; y++) {
-            for (int x = lowerBound; x <= upperBound; x++) {
+            for (int x = lowerBorder; x <= upperBorder; x++) {
                 if (street[y][x] != null) {
                     if (street.length > 1) {
                         simulateTrackSwitching(x, y);

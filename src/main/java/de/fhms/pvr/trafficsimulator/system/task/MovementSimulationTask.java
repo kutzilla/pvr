@@ -1,6 +1,5 @@
 package de.fhms.pvr.trafficsimulator.system.task;
 
-import de.fhms.pvr.trafficsimulator.system.TrafficSimulator;
 import de.fhms.pvr.trafficsimulator.system.Vehicle;
 
 public class MovementSimulationTask extends AbstractSimulationTask {
@@ -18,7 +17,7 @@ public class MovementSimulationTask extends AbstractSimulationTask {
         int tmpSpeed, tmpIndex;
         currentIteration++;
         for (int y = 0; y < street.length; y++) {
-            for (int x = lowerBound; x <= upperBound; x++) {
+            for (int x = lowerBorder; x <= upperBorder; x++) {
                 if ((tmp = street[y][x]) != null && tmp.getMoveCount() < currentIteration) {
                     if ((tmpSpeed = tmp.getCurrentSpeed()) > 0) {
                         tmpIndex = (x + tmpSpeed) % street[y].length;
