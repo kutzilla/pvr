@@ -165,6 +165,8 @@ public class TrafficSimulator {
 
         public TrafficSimulatorBuilder(Vehicle[][] street) {
             this.street = street;
+            this.trackAmount = this.street.length;
+            this.sectionAmount = this.street[0].length;
             this.workerAmount = 1;
             this.taskAmount = 1;
         }
@@ -189,11 +191,6 @@ public class TrafficSimulator {
 
         public TrafficSimulatorBuilder withSlowDawdleProbability(double slowDawdleProbability) {
             this.slowDawdleProbability = slowDawdleProbability;
-            return this;
-        }
-
-        public TrafficSimulatorBuilder withVehicleDensity(double vehicleDensity) {
-            this.vehicleDensity = vehicleDensity;
             return this;
         }
 
