@@ -36,13 +36,15 @@ public class DriveActionSimulationTask extends AbstractSimulationTask {
         int tmpSectionIndex, switchTrackIndex;
         boolean switchTrack;
         boolean dawdle;
-        for (int y = 0; y < street.length; y++) {
+        int streetXlength = street.length;
+        for (int y = 0; y < streetXlength; y++) {
             for (int x = lowerBound; x <= upperBound; x++) {
                 tmp = street[y][x];
                 if (tmp != null) {
                     // Prüfung der Fahrzeuge auf der eigenen Spur
                     for (int i = 1; i <= tmp.getCurrentSpeed() + 1; i++) {
-                        tmpSectionIndex = (x + i) % street[y].length;
+                        int streetYlength = street[y].length;
+                        tmpSectionIndex = (x + i) % streetYlength;
                         // Blockierendes Fahrzeug befindet sich auf der eignen Spur
                         if (street[y][tmpSectionIndex] != null) {
                             // Reset von Wechselspur

@@ -116,7 +116,8 @@ public class ViewController implements Initializable {
             int taskAmount = Integer.parseInt(txtTaskAmount.getText());
             int workerAmount = Integer.parseInt(txtWorkerAmount.getText());
 
-            TrafficSimulator trafficSimulator = new TrafficSimulatorBuilder(trackAmount, sectionAmount, rho)
+            TrafficSimulator trafficSimulator = null;
+            trafficSimulator = new TrafficSimulatorBuilder(trackAmount, sectionAmount, rho)
                     .withSwitchProbability(c).withSlowDawdleProbability(p0).withFastDawdleProbability(p)
                     .withWorkerAmount(workerAmount).withTaskAmount(taskAmount).build();
 
@@ -244,6 +245,7 @@ public class ViewController implements Initializable {
             LOG.info("Fortbewegen:\t" + simulator.getTimeMeasureController().getMeasuredTimeFor(MOVEMENT) + "ms");
             LOG.info("Gesamt:\t\t" + simulator.getTimeMeasureController().getMeasuredTimeFor(ITERATION) + "ms");
             simulator.shutdown();
+
         }
     }
 
