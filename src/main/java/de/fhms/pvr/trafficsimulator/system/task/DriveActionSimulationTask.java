@@ -128,14 +128,25 @@ public class DriveActionSimulationTask extends AbstractSimulationTask {
     }
 
     private boolean isSwitchToTrackPossible(int trackIndex, int sectionIndex, int currentSpeed) {
+        if (street[trackIndex][sectionIndex] != null) {
+            return false;
+        }
+
         int startIndex = sectionIndex - Vehicle.MAX_SPEED;
         if (startIndex < 0) {
-            startIndex = street[0].length - startIndex - 1;
+            startIndex = street[0].length + startIndex;
         }
         startIndex = startIndex % street[trackIndex].length;
+
         int tmpIndex;
-        for (int x = 1; x <= Vehicle.MAX_SPEED + currentSpeed + 1; x++) {
+        for (int x = 0; x <= Vehicle.MAX_SPEED; x++) {
             tmpIndex = (startIndex + x) % street[trackIndex].length;
+            if (street[trackIndex][tmpIndex] != null) {
+                return false;
+            }
+        }
+        for (int x = 1; x <= currentSpeed + 1; x++) {
+            tmpIndex = (sectionIndex + x) % street[trackIndex].length;
             if (street[trackIndex][tmpIndex] != null) {
                 return false;
             }
