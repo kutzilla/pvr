@@ -81,9 +81,9 @@ public class TrafficSimulator {
         int index = 0;
         for (int i = 0; i < taskAmount; i++) {
             if (i < taskAmount - 1) {
-                driveActionSimulationTasks.add(new DriveActionSimulationTask(street, index, index + bound - 1,
+                driveActionSimulationTasks.add(new DriveActionSimulationTask(street, index, index + bound,
                         fastDawdleProbability, slowDawdleProbability, switchProbability));
-                movementSimulationTasks.add(new MovementSimulationTask(street, index, index + bound - 1));
+                movementSimulationTasks.add(new MovementSimulationTask(street, index, index + bound));
                 LOG.debug("Task von " + index + " bis " + (index + bound - 1) + " angelegt");
             } else {
                 driveActionSimulationTasks.add(new DriveActionSimulationTask(street, index, street[0].length - 1,
@@ -91,7 +91,7 @@ public class TrafficSimulator {
                 movementSimulationTasks.add(new MovementSimulationTask(street, index, street[0].length - 1));
                 LOG.debug("Task von " + index + " bis " + (street[0].length - 1) + " angelegt");
             }
-            index += bound;
+            index += bound + 1;
         }
     }
 
