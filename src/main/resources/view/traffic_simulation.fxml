@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.shape.*?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.effect.*?>
 <?import java.lang.*?>
 <?import javafx.scene.canvas.*?>
@@ -46,33 +48,43 @@
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="630.0" prefWidth="839.0">
                      <children>
-                        <Canvas id="streetCanvas" fx:id="canvasStreetLayer" height="132.0" layoutY="440.0" width="800.0" AnchorPane.bottomAnchor="-1.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="440.0" />
                         <Button id="btnStart" fx:id="btnStartSimulation" layoutX="14.0" layoutY="38.0" mnemonicParsing="false" onAction="#startSimulation" text="Start" />
                         <Button layoutX="69.0" layoutY="38.0" mnemonicParsing="false" onAction="#stopSimulation" text="Stop" />
-                        <Canvas fx:id="canvasCarLayer" height="132.0" layoutY="440.0" width="800.0" AnchorPane.bottomAnchor="1.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="440.0" />
                         <Separator layoutY="425.0" prefHeight="1.0" prefWidth="794.0" />
                         <Label layoutX="14.0" layoutY="408.0" prefHeight="17.0" prefWidth="193.0" text="Abschnittsansicht für die Abschnitte" />
                         <Label fx:id="lblLiveFrom" layoutX="214.0" layoutY="408.0" prefHeight="17.0" prefWidth="44.0" />
                         <Label layoutX="258.0" layoutY="408.0" text="bis" />
                         <Label fx:id="lblLiveTo" layoutX="276.0" layoutY="408.0" prefHeight="17.0" prefWidth="50.0" />
-                        <SplitPane dividerPositions="0.5008103727714749" layoutX="166.0" layoutY="7.0" prefHeight="400.0" prefWidth="619.0">
-                          <items>
-                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                        <ScrollPane fx:id="scrollPaneStateView" layoutX="166.0" layoutY="22.0" prefHeight="384.0" prefWidth="300.0">
+                          <content>
+                            <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="379.0" prefWidth="290.0">
                                  <children>
-                                    <ScrollPane fx:id="scrollPaneLeft" layoutX="14.0" layoutY="14.0" prefHeight="378.0" prefWidth="275.0">
-                                      <content>
-                                        <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="379.0" prefWidth="290.0">
-                                             <children>
-                                                <Canvas fx:id="canvasTest" height="365.0" width="260.0" />
-                                             </children>
-                                          </AnchorPane>
-                                      </content>
-                                    </ScrollPane>
+                                    <Canvas fx:id="canvasStateView" height="353.0" layoutY="12.0" width="260.0" />
                                  </children>
                               </AnchorPane>
-                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="147.0" prefWidth="129.0" />
-                          </items>
-                        </SplitPane>
+                          </content>
+                        </ScrollPane>
+                        <ScrollPane fx:id="scrollPaneSectionView" layoutX="3.0" layoutY="427.0" prefHeight="164.0" prefWidth="789.0" style="-fx-background-color: WHITE;">
+                          <content>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="164.0" prefWidth="774.0" style="-fx-background-color: WHITE;">
+                                 <children>
+                                    <Canvas fx:id="canvasStreetLayer" height="150.0" layoutY="8.0" width="800.0" />
+                                    <Canvas fx:id="canvasCarLayer" height="150.0" layoutY="8.0" width="800.0" />
+                                 </children>
+                              </AnchorPane>
+                          </content>
+                        </ScrollPane>
+                        <ScrollPane fx:id="scrollPaneFlowView" layoutX="466.0" layoutY="22.0" prefHeight="384.0" prefWidth="300.0">
+                          <content>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0">
+                                 <children>
+                                    <Canvas fx:id="canvasFlowView" height="200.0" layoutY="26.0" width="200.0" />
+                                 </children>
+                              </AnchorPane>
+                          </content>
+                        </ScrollPane>
+                        <Label layoutX="574.0" layoutY="-2.0" text="Flussdarstellung" />
+                        <Label layoutX="280.0" layoutY="-2.0" text="Statusdarstellung" />
                      </children>
               </AnchorPane>
             </content>
