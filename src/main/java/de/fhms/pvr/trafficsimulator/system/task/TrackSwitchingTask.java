@@ -49,7 +49,7 @@ public class TrackSwitchingTask extends SimulationTask {
     @Override
     public Void call() {
         for (int y = 0; y < street.length; y++) {
-            for (int x = 0; x < street[y].length; x++) {
+            for (int x = lowerBorder; x <= upperBorder; x++) {
                 Vehicle tmp = street[y][x];
                 int tmpSectionIndex, switchTrackIndex;
                 boolean switchTrack;

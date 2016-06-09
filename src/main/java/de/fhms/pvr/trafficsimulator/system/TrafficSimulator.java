@@ -5,9 +5,12 @@ import de.fhms.pvr.trafficsimulator.system.task.SimulationTask;
 import de.fhms.pvr.trafficsimulator.system.task.DriveActionTask;
 import de.fhms.pvr.trafficsimulator.system.task.MovementTask;
 import de.fhms.pvr.trafficsimulator.system.task.TrackSwitchingTask;
+import de.fhms.pvr.trafficsimulator.system.util.SimulationTaskSplitter;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.SplittableRandom;
 import java.util.concurrent.ExecutorService;
@@ -75,26 +78,13 @@ public class TrafficSimulator {
     }
 
     private void fillTaskLists(int sectionAmount, int taskAmount) {
-        int bound = sectionAmount / taskAmount;
-        if (sectionAmount % taskAmount != 0) {
-            bound += 1;
-        }
-        int index = 0;
-        for (int i = 0; i < taskAmount; i++) {
-            if (i < taskAmount - 1) {
-                driveActionTasks.add(new DriveActionTask(street, index, index + bound,
-                        fastDawdleProbability, slowDawdleProbability, switchProbability));
-                movementTasks.add(new MovementTask(street, index, index + bound));
-                trackSwitchingTasks.add(new TrackSwitchingTask(street, index, index + bound, switchProbability));
-                LOG.debug("Task von " + index + " bis " + (index + bound) + " angelegt");
-            } else {
-                driveActionTasks.add(new DriveActionTask(street, index, street[0].length - 1,
-                        fastDawdleProbability, slowDawdleProbability, switchProbability));
-                movementTasks.add(new MovementTask(street, index, street[0].length - 1));
-                trackSwitchingTasks.add(new TrackSwitchingTask(street, index, street[0].length - 1, switchProbability));
-                LOG.debug("Task von " + index + " bis " + (street[0].length) + " angelegt");
-            }
-            index += bound + 1;
+        ArrayList<Pair<Integer, Integer>> pairs = SimulationTaskSplitter
+                .getSimulationTaskBordersFor(sectionAmount, taskAmount);
+        for (Pair<Integer, Integer> p : pairs) {
+            trackSwitchingTasks.add(new TrackSwitchingTask(street, p.getLeft(), p.getRight(), switchProbability));
+            driveActionTasks.add(new DriveActionTask(street, p.getLeft(), p.getRight(),
+                    fastDawdleProbability, slowDawdleProbability, switchProbability));
+            movementTasks.add(new MovementTask(street, p.getLeft(), p.getRight()));
         }
     }
 
