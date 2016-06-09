@@ -4,13 +4,13 @@ import de.fhms.pvr.trafficsimulator.system.Vehicle;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class MovementSimulationTask extends AbstractSimulationTask {
+public class MovementTask extends SimulationTask {
 
-    private static final Logger LOG = LogManager.getLogger(MovementSimulationTask.class);
+    private static final Logger LOG = LogManager.getLogger(MovementTask.class);
 
     private int currentIteration;
 
-    public MovementSimulationTask(Vehicle[][] street, int lowerBorder, int upperBorder) {
+    public MovementTask(Vehicle[][] street, int lowerBorder, int upperBorder) {
         super(street, lowerBorder, upperBorder);
         this.currentIteration = 0;
     }

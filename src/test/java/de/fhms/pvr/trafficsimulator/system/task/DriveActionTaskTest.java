@@ -5,9 +5,9 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;
 
-public class DriveActionSimulationTaskTest {
+public class DriveActionTaskTest {
 
-    private DriveActionSimulationTask driveActionSimulationTask;
+    private DriveActionTask driveActionTask;
 
     private Vehicle[][] testStreet, expectedStreet;
 
@@ -22,13 +22,13 @@ public class DriveActionSimulationTaskTest {
         expectedStreet[0][11] = new Vehicle(3);
 
 
-        driveActionSimulationTask = new DriveActionSimulationTask(testStreet, 0, testStreet.length, 0.0, 0.0, 1.0);
+        driveActionTask = new DriveActionTask(testStreet, 0, testStreet.length, 0.0, 0.0, 1.0);
         for (int i = 0; i < testStreet.length; i++) {
             for (int j = 0; j < testStreet[i].length; j++) {
-                driveActionSimulationTask.simulateTrackSwitching(j, i);
+                driveActionTask.simulateTrackSwitching(j, i);
             }
         }
-        assertArrayEquals(expectedStreet, driveActionSimulationTask.street);
+        assertArrayEquals(expectedStreet, driveActionTask.street);
 
     }
 
@@ -44,13 +44,13 @@ public class DriveActionSimulationTaskTest {
         expectedStreet[0][8] = new Vehicle(3);
         expectedStreet[1][1] = new Vehicle(2);
 
-        driveActionSimulationTask = new DriveActionSimulationTask(testStreet, 0, testStreet.length, 0.0, 0.0, 1.0);
+        driveActionTask = new DriveActionTask(testStreet, 0, testStreet.length, 0.0, 0.0, 1.0);
         for (int i = 0; i < testStreet.length; i++) {
             for (int j = 0; j < testStreet[i].length; j++) {
-                driveActionSimulationTask.simulateTrackSwitching(j, i);
+                driveActionTask.simulateTrackSwitching(j, i);
             }
         }
-        assertArrayEquals(expectedStreet, driveActionSimulationTask.street);
+        assertArrayEquals(expectedStreet, driveActionTask.street);
     }
 
     @Test
@@ -65,13 +65,13 @@ public class DriveActionSimulationTaskTest {
         expectedStreet[0][8] = new Vehicle(3);
         expectedStreet[1][11] = new Vehicle(2);
 
-        driveActionSimulationTask = new DriveActionSimulationTask(testStreet, 0, testStreet.length, 0.0, 0.0, 1.0);
+        driveActionTask = new DriveActionTask(testStreet, 0, testStreet.length, 0.0, 0.0, 1.0);
         for (int i = 0; i < testStreet.length; i++) {
             for (int j = 0; j < testStreet[i].length; j++) {
-                driveActionSimulationTask.simulateTrackSwitching(j, i);
+                driveActionTask.simulateTrackSwitching(j, i);
             }
         }
-        assertArrayEquals(expectedStreet, driveActionSimulationTask.street);
+        assertArrayEquals(expectedStreet, driveActionTask.street);
     }
 
     @Test
@@ -86,13 +86,13 @@ public class DriveActionSimulationTaskTest {
         expectedStreet[2][5] = new Vehicle(3);
         expectedStreet[0][5] = new Vehicle(1);
 
-        driveActionSimulationTask = new DriveActionSimulationTask(testStreet, 0, testStreet.length, 0.0, 0.0, 1.0);
+        driveActionTask = new DriveActionTask(testStreet, 0, testStreet.length, 0.0, 0.0, 1.0);
         for (int i = 0; i < testStreet.length; i++) {
             for (int j = 0; j < testStreet[i].length; j++) {
-                driveActionSimulationTask.simulateTrackSwitching(j, i);
+                driveActionTask.simulateTrackSwitching(j, i);
             }
         }
-        assertArrayEquals(expectedStreet, driveActionSimulationTask.street);
+        assertArrayEquals(expectedStreet, driveActionTask.street);
     }
 
     @Test
@@ -107,13 +107,13 @@ public class DriveActionSimulationTaskTest {
         expectedStreet[0][5] = new Vehicle(1);
         expectedStreet[0][9] = new Vehicle(5);
 
-        driveActionSimulationTask = new DriveActionSimulationTask(testStreet, 0, testStreet.length, 0.0, 0.0, 0.0);
+        driveActionTask = new DriveActionTask(testStreet, 0, testStreet.length, 0.0, 0.0, 0.0);
         for (int i = 0; i < testStreet.length; i++) {
             for (int j = 0; j < testStreet[i].length; j++) {
-                driveActionSimulationTask.simulateAcceleration(j, i);
+                driveActionTask.simulateAcceleration(j, i);
             }
         }
-        assertArrayEquals(expectedStreet, driveActionSimulationTask.street);
+        assertArrayEquals(expectedStreet, driveActionTask.street);
     }
 
     @Test
@@ -128,13 +128,13 @@ public class DriveActionSimulationTaskTest {
         expectedStreet[0][5] = new Vehicle(3);
         expectedStreet[0][9] = new Vehicle(2);
 
-        driveActionSimulationTask = new DriveActionSimulationTask(testStreet, 0, testStreet.length, 0.0, 0.0, 0.0);
+        driveActionTask = new DriveActionTask(testStreet, 0, testStreet.length, 0.0, 0.0, 0.0);
         for (int i = 0; i < testStreet.length; i++) {
             for (int j = 0; j < testStreet[i].length; j++) {
-                driveActionSimulationTask.simulateDeceleration(j, i);
+                driveActionTask.simulateDeceleration(j, i);
             }
         }
-        assertArrayEquals(expectedStreet, driveActionSimulationTask.street);
+        assertArrayEquals(expectedStreet, driveActionTask.street);
     }
 
     @Test
@@ -149,13 +149,13 @@ public class DriveActionSimulationTaskTest {
         expectedStreet[0][5] = new Vehicle(0);
         expectedStreet[0][9] = new Vehicle(5);
 
-        driveActionSimulationTask = new DriveActionSimulationTask(testStreet, 0, testStreet.length, 0.0, 1.0, 0.0);
+        driveActionTask = new DriveActionTask(testStreet, 0, testStreet.length, 0.0, 1.0, 0.0);
         for (int i = 0; i < testStreet.length; i++) {
             for (int j = 0; j < testStreet[i].length; j++) {
-                driveActionSimulationTask.simulateDawdling(j, i);
+                driveActionTask.simulateDawdling(j, i);
             }
         }
-        assertArrayEquals(expectedStreet, driveActionSimulationTask.street);
+        assertArrayEquals(expectedStreet, driveActionTask.street);
     }
 
     @Test
@@ -170,12 +170,12 @@ public class DriveActionSimulationTaskTest {
         expectedStreet[0][5] = new Vehicle(1);
         expectedStreet[0][9] = new Vehicle(4);
 
-        driveActionSimulationTask = new DriveActionSimulationTask(testStreet, 0, testStreet.length, 1.0, 0.0, 0.0);
+        driveActionTask = new DriveActionTask(testStreet, 0, testStreet.length, 1.0, 0.0, 0.0);
         for (int i = 0; i < testStreet.length; i++) {
             for (int j = 0; j < testStreet[i].length; j++) {
-                driveActionSimulationTask.simulateDawdling(j, i);
+                driveActionTask.simulateDawdling(j, i);
             }
         }
-        assertArrayEquals(expectedStreet, driveActionSimulationTask.street);
+        assertArrayEquals(expectedStreet, driveActionTask.street);
     }
 }

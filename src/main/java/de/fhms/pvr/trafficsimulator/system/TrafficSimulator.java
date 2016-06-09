@@ -1,19 +1,17 @@
 package de.fhms.pvr.trafficsimulator.system;
 
 import de.fhms.pvr.trafficsimulator.system.measure.TimeMeasureController;
-import de.fhms.pvr.trafficsimulator.system.task.AbstractSimulationTask;
-import de.fhms.pvr.trafficsimulator.system.task.DriveActionSimulationTask;
-import de.fhms.pvr.trafficsimulator.system.task.MovementSimulationTask;
+import de.fhms.pvr.trafficsimulator.system.task.SimulationTask;
+import de.fhms.pvr.trafficsimulator.system.task.DriveActionTask;
+import de.fhms.pvr.trafficsimulator.system.task.MovementTask;
+import de.fhms.pvr.trafficsimulator.system.task.TrackSwitchingTask;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.SplittableRandom;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import static de.fhms.pvr.trafficsimulator.system.measure.TimeMeasureType.DRIVE_ACTION;
 import static de.fhms.pvr.trafficsimulator.system.measure.TimeMeasureType.ITERATION;
@@ -37,16 +35,19 @@ public class TrafficSimulator {
 
     private ExecutorService executorService;
 
-    private ArrayList<AbstractSimulationTask> driveActionSimulationTasks;
+    private ArrayList<SimulationTask> driveActionTasks;
 
-    private ArrayList<AbstractSimulationTask> movementSimulationTasks;
+    private ArrayList<SimulationTask> movementTasks;
+
+    private ArrayList<SimulationTask> trackSwitchingTasks;
 
     private TrafficSimulator(TrafficSimulatorBuilder builder) {
         this.switchProbability = builder.switchProbability;
         this.slowDawdleProbability = builder.slowDawdleProbability;
         this.fastDawdleProbability = builder.fastDawdleProbability;
-        this.driveActionSimulationTasks = new ArrayList<>();
-        this.movementSimulationTasks = new ArrayList<>();
+        this.driveActionTasks = new ArrayList<>();
+        this.movementTasks = new ArrayList<>();
+        this.trackSwitchingTasks = new ArrayList<>();
         this.timeMeasureController = new TimeMeasureController();
         this.executorService = Executors.newFixedThreadPool(builder.workerAmount);
 
@@ -81,15 +82,17 @@ public class TrafficSimulator {
         int index = 0;
         for (int i = 0; i < taskAmount; i++) {
             if (i < taskAmount - 1) {
-                driveActionSimulationTasks.add(new DriveActionSimulationTask(street, index, index + bound,
+                driveActionTasks.add(new DriveActionTask(street, index, index + bound,
                         fastDawdleProbability, slowDawdleProbability, switchProbability));
-                movementSimulationTasks.add(new MovementSimulationTask(street, index, index + bound));
-                LOG.debug("Task von " + index + " bis " + (index + bound - 1) + " angelegt");
+                movementTasks.add(new MovementTask(street, index, index + bound));
+                trackSwitchingTasks.add(new TrackSwitchingTask(street, index, index + bound, switchProbability));
+                LOG.debug("Task von " + index + " bis " + (index + bound) + " angelegt");
             } else {
-                driveActionSimulationTasks.add(new DriveActionSimulationTask(street, index, street[0].length - 1,
+                driveActionTasks.add(new DriveActionTask(street, index, street[0].length - 1,
                         fastDawdleProbability, slowDawdleProbability, switchProbability));
-                movementSimulationTasks.add(new MovementSimulationTask(street, index, street[0].length - 1));
-                LOG.debug("Task von " + index + " bis " + (street[0].length - 1) + " angelegt");
+                movementTasks.add(new MovementTask(street, index, street[0].length - 1));
+                trackSwitchingTasks.add(new TrackSwitchingTask(street, index, street[0].length - 1, switchProbability));
+                LOG.debug("Task von " + index + " bis " + (street[0].length) + " angelegt");
             }
             index += bound + 1;
         }
@@ -97,31 +100,35 @@ public class TrafficSimulator {
 
     public void iterate() {
         timeMeasureController.startOrResume(ITERATION);
+        simulateTrackSwitching();
         simulateDriveAction();
         simulateMovement();
         timeMeasureController.suspend(ITERATION);
     }
 
     protected void simulateDriveAction() {
-        LOG.debug(driveActionSimulationTasks.toString());
         timeMeasureController.startOrResume(DRIVE_ACTION);
-        try {
-            executorService.invokeAll(driveActionSimulationTasks);
-        } catch (InterruptedException e) {
-            LOG.error(e.getMessage());
-        }
+        simulateTasks(driveActionTasks);
         timeMeasureController.suspend(DRIVE_ACTION);
-        LOG.debug(driveActionSimulationTasks.toString());
     }
     
     protected void simulateMovement() {
         timeMeasureController.startOrResume(MOVEMENT);
+        simulateTasks(movementTasks);
+        timeMeasureController.suspend(MOVEMENT);
+    }
+
+    protected void simulateTrackSwitching() {
+        // TODO Zeitmessung hinzufügen
+        simulateTasks(trackSwitchingTasks);
+    }
+
+    private void simulateTasks(ArrayList<SimulationTask> tasks) {
         try {
-            executorService.invokeAll(movementSimulationTasks);
+            executorService.invokeAll(tasks);
         } catch (InterruptedException e) {
             LOG.error(e.getMessage());
         }
-        timeMeasureController.suspend(MOVEMENT);
     }
 
     public void shutdown() {
