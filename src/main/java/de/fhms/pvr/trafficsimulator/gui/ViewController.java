@@ -339,6 +339,7 @@ public class ViewController implements Initializable {
         protected void succeeded() {
             super.succeeded();
             enableOrDeactivateStart();
+            LOG.info("Spur Wechseln:\t" + simulator.getTimeMeasureController().getMeasuredTimeFor(TRACK_SWITCHING) + "ms");
             LOG.info("Aktionen:\t\t" + simulator.getTimeMeasureController().getMeasuredTimeFor(DRIVE_ACTION) + "ms");
             LOG.info("Fortbewegen:\t" + simulator.getTimeMeasureController().getMeasuredTimeFor(MOVEMENT) + "ms");
             LOG.info("Gesamt:\t\t" + simulator.getTimeMeasureController().getMeasuredTimeFor(ITERATION) + "ms");

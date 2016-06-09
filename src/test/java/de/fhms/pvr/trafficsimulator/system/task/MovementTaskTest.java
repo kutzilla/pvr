@@ -5,9 +5,9 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;
 
-public class MovementSimulationTaskTest {
+public class MovementTaskTest {
 
-    private MovementSimulationTask movementSimulationTask;
+    private MovementTask movementTask;
 
     private Vehicle[][] testStreet;
 
@@ -25,9 +25,9 @@ public class MovementSimulationTaskTest {
         expectedStreet[0][8] = new Vehicle(4);
         expectedStreet[0][1] = new Vehicle(2);
 
-        movementSimulationTask = new MovementSimulationTask(testStreet, 0, testStreet[0].length - 1);
-        movementSimulationTask.call();
-        assertArrayEquals(expectedStreet, movementSimulationTask.getStreet());
+        movementTask = new MovementTask(testStreet, 0, testStreet[0].length - 1);
+        movementTask.call();
+        assertArrayEquals(expectedStreet, movementTask.getStreet());
     }
 
     @Test
@@ -46,9 +46,9 @@ public class MovementSimulationTaskTest {
         expectedStreet[1][8] = new Vehicle(5);
         expectedStreet[1][3] = new Vehicle(4);
 
-        movementSimulationTask = new MovementSimulationTask(testStreet, 0, testStreet[0].length - 1);
-        movementSimulationTask.call();
-        assertArrayEquals(expectedStreet, movementSimulationTask.getStreet());
+        movementTask = new MovementTask(testStreet, 0, testStreet[0].length - 1);
+        movementTask.call();
+        assertArrayEquals(expectedStreet, movementTask.getStreet());
     }
 
     @Test
@@ -73,8 +73,8 @@ public class MovementSimulationTaskTest {
         expectedStreet[2][7] = new Vehicle(1);
         expectedStreet[2][9] = new Vehicle(1);
 
-        movementSimulationTask = new MovementSimulationTask(testStreet, 0, testStreet[0].length - 1);
-        movementSimulationTask.call();
-        assertArrayEquals(expectedStreet, movementSimulationTask.getStreet());
+        movementTask = new MovementTask(testStreet, 0, testStreet[0].length - 1);
+        movementTask.call();
+        assertArrayEquals(expectedStreet, movementTask.getStreet());
     }
 }

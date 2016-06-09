@@ -52,6 +52,8 @@ public class TimeMeasureController {
                 return accelerationStopWatch;
             case MOVEMENT:
                 return movementStopWatch;
+            case TRACK_SWITCHING:
+                return trackSwitchingStopWatch;
             default:
                 return null;
         }

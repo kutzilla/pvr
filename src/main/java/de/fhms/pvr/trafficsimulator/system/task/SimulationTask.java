@@ -4,7 +4,7 @@ import de.fhms.pvr.trafficsimulator.system.Vehicle;
 
 import java.util.concurrent.Callable;
 
-public abstract class AbstractSimulationTask implements Callable<Void> {
+public abstract class SimulationTask implements Callable<Void> {
 
     protected int lowerBorder;
 
@@ -14,7 +14,7 @@ public abstract class AbstractSimulationTask implements Callable<Void> {
 
     protected Vehicle[][] street;
 
-    public AbstractSimulationTask(Vehicle[][] street, int lowerBorder, int upperBorder) {
+    public SimulationTask(Vehicle[][] street, int lowerBorder, int upperBorder) {
         this.street = street;
         this.lowerBorder = lowerBorder;
         this.upperBorder = upperBorder;
