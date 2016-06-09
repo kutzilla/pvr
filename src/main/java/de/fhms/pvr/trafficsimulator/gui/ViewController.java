@@ -4,24 +4,22 @@ package de.fhms.pvr.trafficsimulator.gui;
 import de.fhms.pvr.trafficsimulator.system.TrafficSimulator;
 import de.fhms.pvr.trafficsimulator.system.TrafficSimulator.TrafficSimulatorBuilder;
 import javafx.application.Platform;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 
 import static de.fhms.pvr.trafficsimulator.system.measure.TimeMeasureType.*;
 
@@ -35,7 +33,7 @@ public class ViewController implements Initializable {
     private final int PIXEL_SIZE = 12;
     private final double PADDING = 1.0;
     private final double LINE_WIDTH = 1.0;
-    private volatile boolean  isMoving = false;
+    private volatile boolean isMoving = false;
 
     @FXML
     TabPane tabPaneRoot;
@@ -51,6 +49,12 @@ public class ViewController implements Initializable {
 
     @FXML
     Canvas canvasCarLayer;
+
+    @FXML
+    Canvas canvasFlowView;
+
+    @FXML
+    Canvas canvasStateView;
 
     @FXML
     TextField txtTracks;
@@ -86,10 +90,13 @@ public class ViewController implements Initializable {
     Label lblLiveTo;
 
     @FXML
-    Canvas canvasTest;
+    ScrollPane scrollPaneStateView;
 
     @FXML
-    ScrollPane scrollPaneLeft;
+    ScrollPane scrollPaneSectionView;
+
+    @FXML
+    ScrollPane scrollPaneFlowView;
 
     @FXML
     TextField txtWorkerAmount;
@@ -116,16 +123,12 @@ public class ViewController implements Initializable {
             int taskAmount = Integer.parseInt(txtTaskAmount.getText());
             int workerAmount = Integer.parseInt(txtWorkerAmount.getText());
 
-            TrafficSimulator trafficSimulator = new TrafficSimulatorBuilder(trackAmount, sectionAmount, rho)
+            TrafficSimulator trafficSimulator = null;
+            trafficSimulator = new TrafficSimulatorBuilder(trackAmount, sectionAmount, rho)
                     .withSwitchProbability(c).withSlowDawdleProbability(p0).withFastDawdleProbability(p)
                     .withWorkerAmount(workerAmount).withTaskAmount(taskAmount).build();
 
-            DrawActualStateRunnable drawRunable = new DrawActualStateRunnable(from, to,
-                    trafficSimulator.getStreet(),
-                    trackAmount, canvasCarLayer.getGraphicsContext2D(),
-            LINE_WIDTH, PADDING, PIXEL_SIZE, canvasTest.getGraphicsContext2D());
-
-            SimulateTask simulateTask = initSimulateTask(iterations,trafficSimulator,drawRunable);
+            SimulateTask simulateTask = initSimulateTask(iterations, trafficSimulator, from, to);
 
             initSimulationTab(trackAmount, from, to, iterations);
 
@@ -135,37 +138,50 @@ public class ViewController implements Initializable {
             this.enableOrDeactivateStart();
         }
     }
-    private SimulateTask initSimulateTask(int iterations, TrafficSimulator simulator, DrawActualStateRunnable drawRunable) {
-        SimulateTask simulateTask = new SimulateTask(iterations, simulator);
-        simulateTask.intProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                drawRunable.setIteration(newValue.intValue());
-                Platform.runLater(drawRunable);
-            }
-        });
+
+    private SimulateTask initSimulateTask(int iterations, TrafficSimulator simulator, int from, int to) {
+        SimulateTask simulateTask = new SimulateTask(iterations, simulator, from, to);
         return simulateTask;
     }
+
     private void initSimulationTab(int trackAmount, int from, int to, int iterations) {
         drawStreet(canvasStreetLayer.getGraphicsContext2D(), trackAmount, LINE_WIDTH, from, to);
-        scrollPaneLeft.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        canvasTest.setHeight(iterations);
-        scrollPaneLeft.setContent(canvasTest);
+
+        //Abschnittsansicht
+        Group canvasGroup = new Group(canvasStreetLayer, canvasCarLayer);
+        scrollPaneSectionView.setContent(canvasGroup);
+        //Statusdarstellung
+        scrollPaneStateView.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        canvasStateView.setHeight(iterations);
+        canvasStateView.setWidth(to - from);
+        scrollPaneStateView.setContent(canvasStateView);
+        //Flussdarstellung
+        scrollPaneFlowView.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        canvasFlowView.setHeight(iterations);
+        canvasFlowView.setWidth(to - from);
+        scrollPaneFlowView.setContent(canvasFlowView);
+
+
         lblLiveFrom.setText(String.valueOf(from));
         lblLiveTo.setText(String.valueOf(to));
     }
 
-    private void enableOrDeactivateStart(){
-        if(btnStartSimulation.isDisable()) {
+    private void enableOrDeactivateStart() {
+        if (btnStartSimulation.isDisable()) {
             btnStartSimulation.setDisable(false);
             return;
         }
         btnStartSimulation.setDisable(true);
     }
 
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        scrollPaneSectionView.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+        scrollPaneSectionView.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+        scrollPaneStateView.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+        scrollPaneStateView.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+        scrollPaneFlowView.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+        scrollPaneFlowView.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         initDefaultValues();
     }
 
@@ -205,47 +221,10 @@ public class ViewController implements Initializable {
     private void resetCanvas() {
         canvasCarLayer.getGraphicsContext2D().clearRect(0, 0, canvasCarLayer.getWidth(), canvasCarLayer.getHeight());
         canvasStreetLayer.getGraphicsContext2D().clearRect(0, 0, canvasStreetLayer.getWidth(), canvasStreetLayer.getHeight());
-        canvasTest.getGraphicsContext2D().clearRect(0, 0, canvasTest.getWidth(), canvasTest.getHeight());
+        canvasStateView.getGraphicsContext2D().clearRect(0, 0, canvasStateView.getWidth(), canvasStateView.getHeight());
+        canvasFlowView.getGraphicsContext2D().clearRect(0, 0, canvasStateView.getWidth(), canvasStateView.getHeight());
     }
 
-    private class SimulateTask<Integer> extends Task<Integer> {
-        private IntegerProperty intProperty;
-        private final int iterations;
-        private final TrafficSimulator simulator;
-
-        public SimulateTask(int iterations, TrafficSimulator simulator) {
-            this.iterations = iterations;
-            this.simulator = simulator;
-            this.intProperty = new SimpleIntegerProperty(this, "int", 0);
-        }
-
-        public IntegerProperty intProperty() {
-            return intProperty;
-        }
-
-        @Override
-        protected Integer call() throws Exception {
-            for (int i = 0; i < iterations; i++) {
-                if(isMoving) {
-                    simulator.iterate();
-                    intProperty.set(intProperty.get() + 1);
-                }else{
-                    break;
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void succeeded() {
-            super.succeeded();
-            enableOrDeactivateStart();
-            LOG.info("Aktionen:\t\t" + simulator.getTimeMeasureController().getMeasuredTimeFor(DRIVE_ACTION) + "ms");
-            LOG.info("Fortbewegen:\t" + simulator.getTimeMeasureController().getMeasuredTimeFor(MOVEMENT) + "ms");
-            LOG.info("Gesamt:\t\t" + simulator.getTimeMeasureController().getMeasuredTimeFor(ITERATION) + "ms");
-            simulator.shutdown();
-        }
-    }
 
     private void drawStreet(GraphicsContext gc, int trackAmount, double lineWidth, int from, int to) {
         //Canvas zurücksetzen
@@ -254,6 +233,11 @@ public class ViewController implements Initializable {
         gc.setFill(Color.DARKGRAY);
         double streetHeight = PIXEL_SIZE * trackAmount + 2 * lineWidth + 2 * PADDING + ((trackAmount - 1) * lineWidth + PADDING) + 1;
         double streetWidth = (to - from + PADDING) * PIXEL_SIZE;
+
+        this.canvasStreetLayer.setWidth(streetWidth);
+        this.canvasCarLayer.setWidth(streetWidth);
+        this.canvasStreetLayer.setHeight(streetHeight);
+        this.canvasCarLayer.setHeight(streetHeight);
 
         gc.fillRect(0, 0, streetWidth, streetHeight);
 
@@ -274,9 +258,7 @@ public class ViewController implements Initializable {
             }
             y += PIXEL_SIZE + lineWidth + PADDING;
         }
-
     }
-
 
     /**
      * Prüfung ob input ein Int oder Double ist
@@ -308,6 +290,61 @@ public class ViewController implements Initializable {
             return true;
         }
         return false;
+    }
+
+    private class SimulateTask<Void> extends Task<Void> {
+        private final TrafficSimulator simulator;
+        private final int iterations;
+        private final int from;
+        private final int to;
+
+        public SimulateTask(int iterations, TrafficSimulator simulator, int from, int to) {
+            this.simulator = simulator;
+            this.iterations = iterations;
+            this.from = from;
+            this.to = to;
+        }
+
+        @Override
+        protected Void call() throws Exception {
+            for (int i = 0; i < iterations; i++) {
+                if (isMoving) {
+                    simulator.iterate();
+                    CurrentGenerationDrawer drawRunable = new CurrentGenerationDrawer(from, to,
+                            simulator.getStreet(),
+                            simulator.getStreet().length,
+                            LINE_WIDTH, PADDING, PIXEL_SIZE,
+                            canvasCarLayer.getGraphicsContext2D(),
+                            canvasStateView.getGraphicsContext2D(),
+                            canvasFlowView.getGraphicsContext2D());
+                    drawRunable.setIteration(i);
+                    FutureTask<Boolean> drawTask = new FutureTask<>(drawRunable);
+                    Platform.runLater(drawTask);
+                    try {
+                        drawTask.get();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    break;
+                }
+            }
+            return null;
+        }
+
+
+        @Override
+        protected void succeeded() {
+            super.succeeded();
+            enableOrDeactivateStart();
+            LOG.info("Aktionen:\t\t" + simulator.getTimeMeasureController().getMeasuredTimeFor(DRIVE_ACTION) + "ms");
+            LOG.info("Fortbewegen:\t" + simulator.getTimeMeasureController().getMeasuredTimeFor(MOVEMENT) + "ms");
+            LOG.info("Gesamt:\t\t" + simulator.getTimeMeasureController().getMeasuredTimeFor(ITERATION) + "ms");
+            simulator.shutdown();
+
+        }
     }
 }
 

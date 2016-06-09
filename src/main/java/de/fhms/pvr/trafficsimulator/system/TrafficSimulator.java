@@ -10,10 +10,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SplittableRandom;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 import static de.fhms.pvr.trafficsimulator.system.measure.TimeMeasureType.DRIVE_ACTION;
 import static de.fhms.pvr.trafficsimulator.system.measure.TimeMeasureType.ITERATION;
@@ -25,7 +22,7 @@ public class TrafficSimulator {
 
     private static final SplittableRandom randomGenerator = new SplittableRandom();
 
-    volatile private Vehicle[][] street;
+    private Vehicle[][] street;
 
     private double fastDawdleProbability;
 
@@ -129,6 +126,11 @@ public class TrafficSimulator {
 
     public void shutdown() {
         this.executorService.shutdown();
+        try {
+            this.executorService.awaitTermination(10, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public Vehicle[][] getStreet() {

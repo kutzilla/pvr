@@ -48,6 +48,7 @@ public class DriveActionSimulationTask extends AbstractSimulationTask {
                     if (y < street.length - 1 && switchTrackIndex < 0 &&
                             isSwitchToTrackPossible(y + 1, x, tmp.getCurrentSpeed())) {
                         switchTrackIndex = y + 1;
+
                     }
 
                     // Wechsel möglich
