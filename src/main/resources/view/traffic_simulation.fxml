@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
+<?import javafx.scene.paint.*?>
 <?import javafx.scene.shape.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.effect.*?>
@@ -12,34 +14,209 @@
    <children>
       <TabPane id="tabPane" fx:id="tabPaneRoot" layoutY="28.0" prefHeight="600.0" prefWidth="800.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
         <tabs>
-            <Tab text="Config">
+            <Tab text="Konfiguration">
               <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <TextField fx:id="txtTracks" layoutX="155.0" layoutY="64.0" prefHeight="25.0" prefWidth="90.0" />
-                        <TextField fx:id="txtIterations" layoutX="155.0" layoutY="98.0" prefHeight="25.0" prefWidth="90.0" />
-                        <TextField fx:id="txtSectionAmount" layoutX="155.0" layoutY="131.0" prefHeight="25.0" prefWidth="90.0" />
-                        <TextField fx:id="txtP" layoutX="155.0" layoutY="165.0" prefHeight="25.0" prefWidth="90.0" />
-                        <TextField fx:id="txtP0" layoutX="155.0" layoutY="202.0" prefHeight="25.0" prefWidth="90.0" />
-                        <TextField fx:id="txtRho" layoutX="155.0" layoutY="239.0" prefHeight="25.0" prefWidth="90.0" />
-                        <TextField fx:id="txtSwitchProb" layoutX="155.0" layoutY="276.0" prefHeight="25.0" prefWidth="90.0" />
-                        <TextField fx:id="txtFrom" layoutX="353.0" layoutY="64.0" prefHeight="25.0" prefWidth="54.0" />
-                        <TextField fx:id="txtTo" layoutX="487.0" layoutY="64.0" prefHeight="25.0" prefWidth="54.0" />
-                        <TextField fx:id="txtWorkerAmount" layoutX="353.0" layoutY="98.0" prefHeight="25.0" prefWidth="54.0" />
-                        <TextField fx:id="txtTaskAmount" layoutX="487.0" layoutY="98.0" prefHeight="25.0" prefWidth="54.0" />
-                        <Label layoutX="84.0" layoutY="27.0" text="Config" />
-                        <Label layoutX="14.0" layoutY="68.0" text="Anz. Spuren:" />
-                        <Label layoutX="14.0" layoutY="102.0" text="Anz. Iterationen:" />
-                        <Label layoutX="13.0" layoutY="169.0" text="p (Trödelwahrschein.):" />
-                        <Label layoutX="13.0" layoutY="206.0" text="p0 (Trödwahrsch Stau):" />
-                        <Label layoutX="13.0" layoutY="243.0" text="Fahrzeugdichte:" />
-                        <Label layoutX="13.0" layoutY="280.0" text="Spurwechselwahrsch.:" />
-                        <Label layoutX="14.0" layoutY="135.0" text="Anz. Spurenabschnitte:" />
-                        <Button fx:id="btnDefault" layoutX="14.0" layoutY="325.0" mnemonicParsing="false" onAction="#resetToDefault" text="default" />
-                        <Label layoutX="278.0" layoutY="68.0" text="von:" />
-                        <Label layoutX="424.0" layoutY="68.0" text="bis:" />
-                        <Label layoutX="278.0" layoutY="102.0" text="Anz. Worker:" />
-                        <Label layoutX="424.0" layoutY="102.0" text="Anz. Tasks:" />
+                        <GridPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                          <columnConstraints>
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="50.0" prefWidth="100.0" />
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                          </columnConstraints>
+                          <rowConstraints>
+                            <RowConstraints maxHeight="150.0" minHeight="10.0" percentHeight="30.0" prefHeight="150.0" vgrow="SOMETIMES" />
+                            <RowConstraints maxHeight="300.0" minHeight="10.0" percentHeight="60.0" prefHeight="300.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                          </rowConstraints>
+                           <children>
+                              <GridPane>
+                                <columnConstraints>
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                 <children>
+                                    <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="22.0" prefWidth="262.0" text="Anzahl der Iterationen:" textAlignment="RIGHT" GridPane.columnSpan="6" GridPane.rowIndex="2" />
+                                    <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="22.0" prefWidth="288.0" text="Anzahl der Worker:" textAlignment="RIGHT" GridPane.columnSpan="6" GridPane.rowIndex="4" />
+                                    <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="23.0" prefWidth="262.0" text="Anzahl der Tasks:" textAlignment="RIGHT" GridPane.columnSpan="6" GridPane.rowIndex="6" />
+                                    <Label alignment="BOTTOM_CENTER" contentDisplay="CENTER" prefHeight="39.0" prefWidth="486.0" text="Simulationsoptionen" textAlignment="CENTER" textOverrun="CLIP" GridPane.columnSpan="10">
+                                       <font>
+                                          <Font name="System Bold" size="13.0" />
+                                       </font>
+                                    </Label>
+                                    <TextField fx:id="txtIterations" prefHeight="27.0" prefWidth="31.0" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                                    <TextField fx:id="txtWorkerAmount" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="4" />
+                                    <TextField fx:id="txtTaskAmount" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="6" />
+                                 </children>
+                              </GridPane>
+                              <GridPane GridPane.columnIndex="1">
+                                 <children>
+                                    <Label alignment="BOTTOM_CENTER" contentDisplay="CENTER" prefHeight="39.0" prefWidth="486.0" text="Darstellungsoptionen" textAlignment="CENTER" GridPane.columnSpan="10">
+                                       <font>
+                                          <Font name="System Bold" size="13.0" />
+                                       </font>
+                                    </Label>
+                                    <TextField fx:id="txtFrom" prefHeight="27.0" prefWidth="61.0" GridPane.columnIndex="6" GridPane.rowIndex="2" />
+                                    <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="22.0" prefWidth="219.0" text="Staßenabschnitte anzeigen:" textAlignment="RIGHT" GridPane.columnSpan="5" GridPane.rowIndex="2" />
+                                    <TextField fx:id="txtTo" prefHeight="27.0" prefWidth="61.0" GridPane.columnIndex="8" GridPane.rowIndex="2" />
+                                    <Label alignment="CENTER" prefHeight="42.0" prefWidth="68.0" text="bis" textFill="DIMGRAY" GridPane.columnIndex="7" GridPane.rowIndex="2" />
+                                 </children>
+                                 <columnConstraints>
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                 </columnConstraints>
+                                 <rowConstraints>
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                 </rowConstraints>
+                              </GridPane>
+                              <GridPane GridPane.rowIndex="1">
+                                 <children>
+                                    <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="23.0" prefWidth="250.0" text="Trödelwahrscheinlichkeit (p):" textAlignment="RIGHT" GridPane.columnSpan="6" GridPane.rowIndex="2" />
+                                    <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="24.0" prefWidth="256.0" text="Trödelwahrscheinlichkeit (p0):" textAlignment="RIGHT" GridPane.columnSpan="6" GridPane.rowIndex="4" />
+                                    <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="24.0" prefWidth="267.0" text="Spurwechselwahrscheinlichkeit (c):" textAlignment="RIGHT" GridPane.columnSpan="6" GridPane.rowIndex="6" />
+                                    <Label alignment="BOTTOM_CENTER" contentDisplay="CENTER" prefHeight="39.0" prefWidth="486.0" text="Wahrscheinlichkeiten" textAlignment="CENTER" GridPane.columnSpan="10">
+                                       <font>
+                                          <Font name="System Bold" size="13.0" />
+                                       </font>
+                                    </Label>
+                                    <TextField fx:id="txtP" prefHeight="27.0" prefWidth="31.0" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                                    <TextField fx:id="txtP0" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="4" />
+                                    <TextField fx:id="txtSwitchProb" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="6" />
+                                 </children>
+                                 <columnConstraints>
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                 </columnConstraints>
+                                 <rowConstraints>
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                 </rowConstraints>
+                              </GridPane>
+                              <GridPane prefHeight="321.0" prefWidth="91.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                 <children>
+                                    <Label alignment="BOTTOM_CENTER" contentDisplay="CENTER" prefHeight="39.0" prefWidth="486.0" text="Straßenoptionen" textAlignment="CENTER" textOverrun="CLIP" GridPane.columnSpan="10">
+                                       <font>
+                                          <Font name="System Bold" size="13.0" />
+                                       </font>
+                                    </Label>
+                                    <RadioButton fx:id="rbtnRandomConfig" mnemonicParsing="false" prefHeight="25.0" prefWidth="344.0" selected="true" text="Zufällige Konfiguration" GridPane.columnIndex="1" GridPane.columnSpan="6" GridPane.rowIndex="2">
+                                       <toggleGroup>
+                                          <ToggleGroup fx:id="streetOption" />
+                                       </toggleGroup>
+                                    </RadioButton>
+                                    <RadioButton fx:id="rbtnExistingConfig" mnemonicParsing="false" prefHeight="25.0" prefWidth="288.0" text="Vorhandene Konfiguration" toggleGroup="$streetOption" GridPane.columnIndex="1" GridPane.columnSpan="6" GridPane.rowIndex="10" />
+                                    <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="24.0" prefWidth="275.0" text="Fahrzeugdichte (ρ):" textAlignment="RIGHT" GridPane.columnSpan="6" GridPane.rowIndex="4" />
+                                    <TextField fx:id="txtRho" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="4" />
+                                    <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="24.0" prefWidth="260.0" text="Anzahl der Spuren:" textAlignment="RIGHT" GridPane.columnSpan="6" GridPane.rowIndex="6" />
+                                    <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="24.0" prefWidth="248.0" text="Anzahl der Spurabschnitte:" textAlignment="RIGHT" GridPane.columnSpan="6" GridPane.rowIndex="8" />
+                                    <TextField fx:id="txtTracks" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="6" />
+                                    <TextField fx:id="txtSectionAmount" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="8" />
+                                    <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="24.0" prefWidth="241.0" text="Datei:" textAlignment="RIGHT" GridPane.columnSpan="4" GridPane.rowIndex="12" />
+                                    <Button mnemonicParsing="false" text="Auswählen" GridPane.columnIndex="8" GridPane.rowIndex="12" />
+                                    <Label prefHeight="24.0" prefWidth="126.0" textFill="DIMGRAY" GridPane.columnIndex="5" GridPane.columnSpan="3" GridPane.rowIndex="12" />
+                                 </children>
+                                 <columnConstraints>
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                 </columnConstraints>
+                                 <rowConstraints>
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                 </rowConstraints>
+                              </GridPane>
+                              <GridPane GridPane.columnSpan="2" GridPane.rowIndex="2">
+                                <columnConstraints>
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="2.0" prefWidth="100.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="25.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                 <children>
+                                    <Button mnemonicParsing="false" onAction="#resetToDefault" prefHeight="29.0" prefWidth="199.0" text="Einstellungen zurücksetzen" GridPane.columnIndex="1" GridPane.columnSpan="2" />
+                                 </children>
+                                 <GridPane.margin>
+                                    <Insets />
+                                 </GridPane.margin>
+                              </GridPane>
+                           </children>
+                        </GridPane>
                      </children>
                   </AnchorPane>
               </content>
