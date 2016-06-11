@@ -1,6 +1,7 @@
 package de.fhms.pvr.trafficsimulator.system.task;
 
 import de.fhms.pvr.trafficsimulator.system.Vehicle;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -14,6 +15,7 @@ public class TrackSwitchingTaskTest {
     private TrackSwitchingTask trackSwitchingTask;
 
     @Test
+    @Ignore
     public void testSimulateTrackSwitchingIsPossible() {
         testStreet = new Vehicle[2][20];
         testStreet[0][5] = new Vehicle(5);
@@ -22,7 +24,6 @@ public class TrackSwitchingTaskTest {
         expectedStreet = new Vehicle[2][20];
         expectedStreet[1][5] = new Vehicle(5);
         expectedStreet[0][11] = new Vehicle(3);
-
 
         trackSwitchingTask = new TrackSwitchingTask(testStreet, 0, testStreet.length, 1.0);
         trackSwitchingTask.call();

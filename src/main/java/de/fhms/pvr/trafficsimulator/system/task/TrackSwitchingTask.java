@@ -49,11 +49,11 @@ public class TrackSwitchingTask extends SimulationTask {
 
     @Override
     public Void call() {
+        int tmpSectionIndex, switchTrackIndex;
+        boolean switchTrack;
         for (int y = 0; y < street.length; y++) {
             for (int x = lowerBorder; x <= upperBorder; x++) {
                 Vehicle tmp = street[y][x];
-                int tmpSectionIndex, switchTrackIndex;
-                boolean switchTrack;
                 if (tmp != null) {
                     // Prüfung der Fahrzeuge auf der eigenen Spur
                     for (int i = 1; i <= tmp.getCurrentSpeed() + 1; i++) {
@@ -64,12 +64,14 @@ public class TrackSwitchingTask extends SimulationTask {
                             switchTrackIndex = -1;
                             // Prüfung der Spur oberhalb
                             if (y > 0 && isSwitchToTrackPossible(y - 1, x, tmp.getCurrentSpeed())) {
+                                LOG.debug("Die Spur " + (y - 1) + " wird auf einen Wechsel geprüft");
                                 switchTrackIndex = y - 1;
                             }
                             // Prüfung der Spur unterhalb und ein Wechsel
                             // oberhalb nicht bereits möglich wäre
                             if (y < street.length - 1 && switchTrackIndex < 0 &&
                                     isSwitchToTrackPossible(y + 1, x, tmp.getCurrentSpeed())) {
+                                LOG.debug("Die Spur " + (y + 1) + " wird auf einen Wechsel geprüft");
                                 switchTrackIndex = y + 1;
                             }
 
