@@ -3,6 +3,7 @@ package de.fhms.pvr.trafficsimulator.gui;
 
 import de.fhms.pvr.trafficsimulator.system.TrafficSimulator;
 import de.fhms.pvr.trafficsimulator.system.TrafficSimulator.TrafficSimulatorBuilder;
+import de.fhms.pvr.trafficsimulator.system.util.StreetConfigurationParser;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.Event;
@@ -13,9 +14,12 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutionException;
@@ -107,6 +111,22 @@ public class ViewController implements Initializable {
     @FXML
     Button btnStartSimulation;
 
+    @FXML
+    Button btnChooseConfigurationFile;
+
+    @FXML
+    Label lblFileName;
+
+    @FXML
+    RadioButton rbtnRandomConfig;
+
+    @FXML
+    RadioButton rbtnExistingConfig;
+
+
+    private File configurationFile;
+
+
 
     public void startSimulation(Event event) {
         if (validateInputFields()) {
@@ -124,9 +144,19 @@ public class ViewController implements Initializable {
             int workerAmount = Integer.parseInt(txtWorkerAmount.getText());
 
             TrafficSimulator trafficSimulator = null;
-            trafficSimulator = new TrafficSimulatorBuilder(trackAmount, sectionAmount, rho)
-                    .withSwitchProbability(c).withSlowDawdleProbability(p0).withFastDawdleProbability(p)
-                    .withWorkerAmount(workerAmount).withTaskAmount(taskAmount).build();
+            TrafficSimulatorBuilder builder = null;
+            if (rbtnExistingConfig.isSelected() && configurationFile != null) {
+                try {
+                    builder = new TrafficSimulatorBuilder(StreetConfigurationParser
+                            .parseStreetConfigurationFrom(configurationFile));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                builder = new TrafficSimulatorBuilder(trackAmount, sectionAmount, rho);
+            }
+            trafficSimulator = builder.withSwitchProbability(c).withSlowDawdleProbability(p0)
+                    .withFastDawdleProbability(p).withWorkerAmount(workerAmount).withTaskAmount(taskAmount).build();
 
             SimulateTask simulateTask = initSimulateTask(iterations, trafficSimulator, from, to);
 
@@ -196,6 +226,19 @@ public class ViewController implements Initializable {
      */
     public void resetToDefault(Event event) {
         this.initDefaultValues();
+    }
+
+    public void chooseConfigurationFile(Event event) {
+        LOG.debug("Dateiauswahl angeklickt");
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Configuration File (*.csv)","*.csv"));
+        File file = fileChooser.showOpenDialog(null);
+
+        if (file != null) {
+            LOG.info(file + " wurde ausgewählt");
+            this.configurationFile = file;
+            this.lblFileName.setText(file.getName());
+        }
     }
 
     /**
