@@ -15,7 +15,6 @@ public class TrackSwitchingTaskTest {
     private TrackSwitchingTask trackSwitchingTask;
 
     @Test
-    @Ignore
     public void testSimulateTrackSwitchingIsPossible() {
         testStreet = new Vehicle[2][20];
         testStreet[0][5] = new Vehicle(5);
@@ -25,7 +24,7 @@ public class TrackSwitchingTaskTest {
         expectedStreet[1][5] = new Vehicle(5);
         expectedStreet[0][11] = new Vehicle(3);
 
-        trackSwitchingTask = new TrackSwitchingTask(testStreet, 0, testStreet.length, 1.0);
+        trackSwitchingTask = new TrackSwitchingTask(testStreet, 0, testStreet[0].length - 1, 1.0);
         trackSwitchingTask.call();
         assertArrayEquals(expectedStreet, trackSwitchingTask.street);
 
@@ -44,7 +43,7 @@ public class TrackSwitchingTaskTest {
         expectedStreet[1][1] = new Vehicle(2);
 
 
-        trackSwitchingTask = new TrackSwitchingTask(testStreet, 0, testStreet.length, 1.0);
+        trackSwitchingTask = new TrackSwitchingTask(testStreet, 0, testStreet[0].length - 1, 1.0);
         trackSwitchingTask.call();
         assertArrayEquals(expectedStreet, trackSwitchingTask.street);
     }
@@ -61,7 +60,7 @@ public class TrackSwitchingTaskTest {
         expectedStreet[0][8] = new Vehicle(3);
         expectedStreet[1][11] = new Vehicle(2);
 
-        trackSwitchingTask = new TrackSwitchingTask(testStreet, 0, testStreet.length, 1.0);
+        trackSwitchingTask = new TrackSwitchingTask(testStreet, 0, testStreet[0].length - 1, 1.0);
         trackSwitchingTask.call();
         assertArrayEquals(expectedStreet, trackSwitchingTask.street);
     }
@@ -78,7 +77,7 @@ public class TrackSwitchingTaskTest {
         expectedStreet[2][5] = new Vehicle(3);
         expectedStreet[0][5] = new Vehicle(1);
 
-        trackSwitchingTask = new TrackSwitchingTask(testStreet, 0, testStreet.length, 1.0);
+        trackSwitchingTask = new TrackSwitchingTask(testStreet, 0, testStreet[0].length - 1, 1.0);
         trackSwitchingTask.call();
         assertArrayEquals(expectedStreet, trackSwitchingTask.street);
     }

@@ -69,7 +69,7 @@ public class TrackSwitchingTask extends SimulationTask {
                             }
                             // Prüfung der Spur unterhalb und ein Wechsel
                             // oberhalb nicht bereits möglich wäre
-                            if (y < street.length - 1 && switchTrackIndex < 0 &&
+                            if (y < (street.length - 1) && switchTrackIndex < 0 &&
                                     isSwitchToTrackPossible(y + 1, x, tmp.getCurrentSpeed())) {
                                 LOG.debug("Die Spur " + (y + 1) + " wird auf einen Wechsel geprüft");
                                 switchTrackIndex = y + 1;
