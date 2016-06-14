@@ -79,6 +79,10 @@ public class TrackSwitchingTask extends SimulationTask {
                                 switchTrack = RandomProbabilityGenerator.generate(switchProbability);
                                 // Ausführung des Wechsels
                                 if (switchTrack) {
+                                    if (street[switchTrackIndex][x] != null) {
+                                        LOG.error("Beim Wechsel von " + y + " auf " + switchTrackIndex + " wird ein " +
+                                                "Fahrzeug an Position " + x + " überfahren");
+                                    }
                                     street[y][x] = null;
                                     street[switchTrackIndex][x] = tmp;
                                     LOG.debug(tmp + " wechselt von " + y + " auf die Spur " + switchTrackIndex);
