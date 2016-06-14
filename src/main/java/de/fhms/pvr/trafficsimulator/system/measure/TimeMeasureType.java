@@ -4,5 +4,8 @@ public enum TimeMeasureType {
     ITERATION,
     DRIVE_ACTION,
     MOVEMENT,
-    TRACK_SWITCHING
+    TRACK_SWITCHING,
+    KAPPA,
+    SIGMA,
+    PHI
 }

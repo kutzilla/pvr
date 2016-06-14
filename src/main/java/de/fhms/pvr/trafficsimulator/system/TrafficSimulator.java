@@ -30,6 +30,10 @@ public class TrafficSimulator {
 
     private double switchProbability;
 
+    private int vehicleAmount;
+
+    private int workerAmount;
+
     private TimeMeasureController timeMeasureController;
 
     private ExecutorService executorService;
@@ -48,7 +52,9 @@ public class TrafficSimulator {
         this.driveActionTasks = new ArrayList<>();
         this.movementTasks = new ArrayList<>();
         this.trackSwitchingTasks = new ArrayList<>();
-        this.executorService = Executors.newFixedThreadPool(builder.workerAmount);
+        this.workerAmount = builder.workerAmount;
+        this.executorService = Executors.newFixedThreadPool(workerAmount);
+        this.vehicleAmount = (int) ((double) builder.trackAmount * builder.sectionAmount * builder.vehicleDensity);
 
         if (builder.street != null) {
             this.street = builder.street;
@@ -61,9 +67,8 @@ public class TrafficSimulator {
     private void createRandomStreet(int trackAmount, int sectionAmount, double vehicleDensity) {
         street = new Vehicle[trackAmount][sectionAmount];
         int randomTrackIndex, randomSectionIndex;
-        int vehicleCount = (int) ((double) trackAmount * sectionAmount * vehicleDensity);
         Vehicle tmp;
-        for (int i = 0; i < vehicleCount; i++) {
+        for (int i = 0; i < vehicleAmount; i++) {
             tmp = new Vehicle(randomGenerator.nextInt(Vehicle.MAX_SPEED + 1));
             do {
                 randomTrackIndex = randomGenerator.nextInt(trackAmount);
@@ -86,48 +91,41 @@ public class TrafficSimulator {
     }
 
     public void iterate() {
-        timeMeasureController.startOrResume(ITERATION);
+        timeMeasureController.startOrResume(KAPPA);
         if (street.length > 1) {
             simulateTrackSwitching();
         }
         simulateDriveAction();
         simulateMovement();
-        timeMeasureController.suspend(ITERATION);
+        timeMeasureController.suspend(KAPPA);
     }
 
     protected void simulateDriveAction() {
-        timeMeasureController.startOrResume(DRIVE_ACTION);
         simulateTasks(driveActionTasks);
-        timeMeasureController.suspend(DRIVE_ACTION);
     }
     
     protected void simulateMovement() {
-        timeMeasureController.startOrResume(MOVEMENT);
         simulateTasks(movementTasks);
-        timeMeasureController.suspend(MOVEMENT);
     }
 
     protected void simulateTrackSwitching() {
-        timeMeasureController.startOrResume(TRACK_SWITCHING);
         simulateTasks(trackSwitchingTasks);
-        timeMeasureController.suspend(TRACK_SWITCHING);
     }
 
     private void simulateTasks(ArrayList<SimulationTask> tasks) {
+        timeMeasureController.suspend(KAPPA);
         try {
+            timeMeasureController.startOrResume(PHI);
             executorService.invokeAll(tasks);
+            timeMeasureController.suspend(PHI);
         } catch (InterruptedException e) {
             LOG.error(e.getMessage());
         }
+        timeMeasureController.startOrResume(KAPPA);
     }
 
     public void shutdown() {
         this.executorService.shutdown();
-        try {
-            this.executorService.awaitTermination(10, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     public Vehicle[][] getStreet() {
@@ -136,6 +134,26 @@ public class TrafficSimulator {
 
     public TimeMeasureController getTimeMeasureController() {
         return timeMeasureController;
+    }
+
+    public int getTrackAmount() {
+        return street.length;
+    }
+
+    public int getSectionAmount() {
+        return street[0].length;
+    }
+
+    public int getTotalSectionAmount() {
+        return street.length * street[0].length;
+    }
+
+    public int getVehicleAmount() {
+        return vehicleAmount;
+    }
+
+    public int getWorkerAmount() {
+        return workerAmount;
     }
 
 

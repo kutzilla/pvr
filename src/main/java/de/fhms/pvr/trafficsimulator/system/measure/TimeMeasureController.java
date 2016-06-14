@@ -8,21 +8,24 @@ public class TimeMeasureController {
 
     private StopWatch accelerationStopWatch;
 
-    private StopWatch decelerationStopWatch;
-
     private StopWatch trackSwitchingStopWatch;
 
     private StopWatch movementStopWatch;
 
-    private StopWatch dawdlingStopWatch;
+    private StopWatch kappaStopWatch;
+
+    private StopWatch phiStopWatch;
+
+    private StopWatch sigmaStopWatch;
 
     public TimeMeasureController() {
         this.iteration = new StopWatch();
         this.accelerationStopWatch = new StopWatch();
-        this.decelerationStopWatch = new StopWatch();
         this.trackSwitchingStopWatch = new StopWatch();
         this.movementStopWatch = new StopWatch();
-        this.dawdlingStopWatch = new StopWatch();
+        this.kappaStopWatch = new StopWatch();
+        this.phiStopWatch = new StopWatch();
+        this.sigmaStopWatch = new StopWatch();
     }
 
     public void startOrResume(TimeMeasureType type) {
@@ -54,6 +57,12 @@ public class TimeMeasureController {
                 return movementStopWatch;
             case TRACK_SWITCHING:
                 return trackSwitchingStopWatch;
+            case KAPPA:
+                return kappaStopWatch;
+            case PHI:
+                return phiStopWatch;
+            case SIGMA:
+                return sigmaStopWatch;
             default:
                 return null;
         }

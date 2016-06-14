@@ -3,6 +3,7 @@ package de.fhms.pvr.trafficsimulator.gui;
 
 import de.fhms.pvr.trafficsimulator.system.TrafficSimulator;
 import de.fhms.pvr.trafficsimulator.system.TrafficSimulator.TrafficSimulatorBuilder;
+import de.fhms.pvr.trafficsimulator.system.measure.TimeMeasureController;
 import de.fhms.pvr.trafficsimulator.system.util.StreetConfigurationParser;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -123,6 +124,32 @@ public class ViewController implements Initializable {
     @FXML
     RadioButton rbtnExistingConfig;
 
+    @FXML
+    Label lblWorker;
+
+    @FXML
+    Label lblTracks;
+
+    @FXML
+    Label lblSections;
+
+    @FXML
+    Label lblTotalSections;
+
+    @FXML
+    Label lblPhi;
+
+    @FXML
+    Label lblSigma;
+
+    @FXML
+    Label lblKappa;
+
+    @FXML
+    Label lblVehicles;
+
+    @FXML
+    Label lblIterations;
 
     private File configurationFile;
 
@@ -387,7 +414,16 @@ public class ViewController implements Initializable {
             LOG.info("Fortbewegen:\t" + simulator.getTimeMeasureController().getMeasuredTimeFor(MOVEMENT) + "ms");
             LOG.info("Gesamt:\t\t" + simulator.getTimeMeasureController().getMeasuredTimeFor(ITERATION) + "ms");
             simulator.shutdown();
-
+            TimeMeasureController timeMeasureController = simulator.getTimeMeasureController();
+            lblKappa.setText(String.valueOf(timeMeasureController.getMeasuredTimeFor(KAPPA)));
+            lblPhi.setText(String.valueOf(timeMeasureController.getMeasuredTimeFor(PHI)));
+            lblSigma.setText(String.valueOf(timeMeasureController.getMeasuredTimeFor(SIGMA)));
+            lblTracks.setText(String.valueOf(simulator.getTrackAmount()));
+            lblSections.setText(String.valueOf(simulator.getSectionAmount()));
+            lblTotalSections.setText(String.valueOf(simulator.getTotalSectionAmount()));
+            lblVehicles.setText(String.valueOf(simulator.getVehicleAmount()));
+            lblWorker.setText(String.valueOf(simulator.getWorkerAmount()));
+            lblIterations.setText(String.valueOf(this.iterations));
         }
     }
 }
