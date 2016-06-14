@@ -106,7 +106,6 @@ public class TrafficSimulator {
     }
 
     protected void simulateTrackSwitching() {
-        // TODO Zeitmessung hinzufügen
         timeMeasureController.startOrResume(TRACK_SWITCHING);
         simulateTasks(trackSwitchingTasks);
         timeMeasureController.suspend(TRACK_SWITCHING);
