@@ -10,7 +10,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.SplittableRandom;
 import java.util.concurrent.*;
@@ -45,10 +44,10 @@ public class TrafficSimulator {
         this.switchProbability = builder.switchProbability;
         this.slowDawdleProbability = builder.slowDawdleProbability;
         this.fastDawdleProbability = builder.fastDawdleProbability;
+        this.timeMeasureController = new TimeMeasureController();
         this.driveActionTasks = new ArrayList<>();
         this.movementTasks = new ArrayList<>();
         this.trackSwitchingTasks = new ArrayList<>();
-        this.timeMeasureController = new TimeMeasureController();
         this.executorService = Executors.newFixedThreadPool(builder.workerAmount);
 
         if (builder.street != null) {
@@ -77,6 +76,7 @@ public class TrafficSimulator {
     private void fillTaskLists(int sectionAmount, int taskAmount) {
         ArrayList<Pair<Integer, Integer>> pairs = SimulationTaskSplitter
                 .getSimulationTaskBordersFor(sectionAmount, taskAmount);
+
         for (Pair<Integer, Integer> p : pairs) {
             trackSwitchingTasks.add(new TrackSwitchingTask(street, p.getLeft(), p.getRight(), switchProbability));
             driveActionTasks.add(new DriveActionTask(street, p.getLeft(), p.getRight(),

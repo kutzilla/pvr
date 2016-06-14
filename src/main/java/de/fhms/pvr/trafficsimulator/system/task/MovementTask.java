@@ -1,5 +1,6 @@
 package de.fhms.pvr.trafficsimulator.system.task;
 
+import de.fhms.pvr.trafficsimulator.system.TrafficSimulator;
 import de.fhms.pvr.trafficsimulator.system.Vehicle;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,10 +30,12 @@ public class MovementTask extends SimulationTask {
                             LOG.error("Das Auto kommt von " + x + ":" + y + " mit der Geschwindigkeit " + tmpSpeed +
                                     " und das Auto an der Position " + tmpIndex + ":" + y + " wird überfahren");
                         }
+                        tmp.incrementMoveCount();
                         street[y][x] = null;
                         street[y][tmpIndex] = tmp;
+                    } else {
+                        tmp.incrementMoveCount();
                     }
-                    tmp.incrementMoveCount();
                 }
             }
         }
