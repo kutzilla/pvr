@@ -87,7 +87,9 @@ public class TrafficSimulator {
 
     public void iterate() {
         timeMeasureController.startOrResume(ITERATION);
-        simulateTrackSwitching();
+        if (street.length > 1) {
+            simulateTrackSwitching();
+        }
         simulateDriveAction();
         simulateMovement();
         timeMeasureController.suspend(ITERATION);

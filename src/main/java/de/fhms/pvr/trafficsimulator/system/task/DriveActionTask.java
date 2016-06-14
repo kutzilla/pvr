@@ -1,10 +1,9 @@
 package de.fhms.pvr.trafficsimulator.system.task;
 
 import de.fhms.pvr.trafficsimulator.system.Vehicle;
+import de.fhms.pvr.trafficsimulator.system.util.RandomProbabilityGenerator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.concurrent.ThreadLocalRandom;
 
 public class DriveActionTask extends SimulationTask {
 
@@ -13,7 +12,6 @@ public class DriveActionTask extends SimulationTask {
     private double fastDawdleProbability;
 
     private double slowDawdleProbability;
-
 
     public DriveActionTask(Vehicle[][] street, int lowerBorder, int upperBorder,
                            double fastDawdleProbability, double slowDawdleProbability) {
@@ -44,9 +42,9 @@ public class DriveActionTask extends SimulationTask {
         boolean dawdle;
         if ((tmpCurrentSpeed = v.getCurrentSpeed()) > 0) {
             if (tmpCurrentSpeed > 1) {
-                dawdle = (((double) ThreadLocalRandom.current().nextInt(100)) / 100) <= fastDawdleProbability;
+                dawdle = RandomProbabilityGenerator.generate(fastDawdleProbability);
             } else {
-                dawdle = (((double) ThreadLocalRandom.current().nextInt(100)) / 100) <= slowDawdleProbability;
+                dawdle = RandomProbabilityGenerator.generate(slowDawdleProbability);
             }
             if (dawdle) {
                 v.decrementCurrentSpeed();

@@ -1,6 +1,7 @@
 package de.fhms.pvr.trafficsimulator.system.task;
 
 import de.fhms.pvr.trafficsimulator.system.Vehicle;
+import de.fhms.pvr.trafficsimulator.system.util.RandomProbabilityGenerator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -10,8 +11,6 @@ import java.util.concurrent.ThreadLocalRandom;
 public class TrackSwitchingTask extends SimulationTask {
 
     private static final Logger LOG = LogManager.getLogger(TrackSwitchingTask.class);
-
-    private static final SplittableRandom randomGenerator = new SplittableRandom();
 
     private double switchProbability;
 
@@ -77,7 +76,7 @@ public class TrackSwitchingTask extends SimulationTask {
 
                             // Wechsel möglich
                             if (switchTrackIndex >= 0) {
-                                switchTrack = (((double) ThreadLocalRandom.current().nextInt(100)) / 100) <= switchProbability;
+                                switchTrack = RandomProbabilityGenerator.generate(switchProbability);
                                 // Ausführung des Wechsels
                                 if (switchTrack) {
                                     street[y][x] = null;
