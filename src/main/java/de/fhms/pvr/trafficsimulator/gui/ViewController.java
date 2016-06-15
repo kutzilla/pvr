@@ -184,18 +184,19 @@ public class ViewController implements Initializable {
 
 
     public void startSimulation(Event event) {
-        this.initSimulation();
-        SimulateTask simulateTask = initSimulateTask(iterations, trafficSimulator, from, to);
-        Thread workerThread = new Thread(simulateTask);
-        this.isMoving = true;
-        workerThread.start();
-        this.enableOrDeactivateStart();
+        if(this.initSimulation()) {
+            SimulateTask simulateTask = initSimulateTask(iterations, trafficSimulator, from, to);
+            Thread workerThread = new Thread(simulateTask);
+            this.isMoving = true;
+            workerThread.start();
+            this.enableOrDeactivateStart();
+        }
     }
 
     /**
      * Initialisierung der Parameter sowie des Trafficsimulators
      */
-    private void initSimulation() {
+    private boolean initSimulation() {
         if (validateInputFields()) {
             //Initialisierung der Parameter
             trackAmount = Integer.parseInt(txtTracks.getText());
@@ -235,7 +236,9 @@ public class ViewController implements Initializable {
 
 
             initSimulationTab(trackAmount, from, to, iterations);
+            return true;
         }
+        return false;
     }
 
     private SimulateTask initSimulateTask(int iterations, TrafficSimulator simulator, int from, int to) {

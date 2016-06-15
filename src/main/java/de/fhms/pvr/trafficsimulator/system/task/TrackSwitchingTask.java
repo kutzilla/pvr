@@ -2,9 +2,11 @@ package de.fhms.pvr.trafficsimulator.system.task;
 
 import de.fhms.pvr.trafficsimulator.system.Vehicle;
 import de.fhms.pvr.trafficsimulator.system.util.RandomProbabilityGenerator;
+import org.apache.commons.lang3.tuple.Triple;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
 import java.util.SplittableRandom;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -68,7 +70,7 @@ public class TrackSwitchingTask extends SimulationTask {
                             }
                             // Prüfung der Spur unterhalb und ein Wechsel
                             // oberhalb nicht bereits möglich wäre
-                            if (y < (street.length - 1) && switchTrackIndex < 0 &&
+                            else if (y < (street.length - 1) &&
                                     isSwitchToTrackPossible(y + 1, x, tmp.getCurrentSpeed())) {
                                 LOG.debug("Die Spur " + (y + 1) + " wird auf einen Wechsel geprüft");
                                 switchTrackIndex = y + 1;
@@ -86,6 +88,7 @@ public class TrackSwitchingTask extends SimulationTask {
                                     street[y][x] = null;
                                     street[switchTrackIndex][x] = tmp;
                                     LOG.debug(tmp + " wechselt von " + y + " auf die Spur " + switchTrackIndex);
+                                    break;
                                 }
                             }
                         }
@@ -96,3 +99,4 @@ public class TrackSwitchingTask extends SimulationTask {
         return null;
     }
 }
+
