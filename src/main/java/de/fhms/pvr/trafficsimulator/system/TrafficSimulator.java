@@ -34,6 +34,8 @@ public class TrafficSimulator {
 
     private int workerAmount;
 
+    private int taskAmount;
+
     private TimeMeasureController timeMeasureController;
 
     private ExecutorService executorService;
@@ -56,6 +58,7 @@ public class TrafficSimulator {
         this.movementTasks = new ArrayList<>();
         this.trackSwitchingTasks = new ArrayList<>();
         this.workerAmount = builder.workerAmount;
+        this.taskAmount = builder.taskAmount;
 
 
         if(builder.vehicleAmount == 0) {
@@ -172,6 +175,8 @@ public class TrafficSimulator {
     public int getWorkerAmount() {
         return workerAmount;
     }
+
+    public int getTaskAmount() { return taskAmount; }
 
 
     public static class TrafficSimulatorBuilder {

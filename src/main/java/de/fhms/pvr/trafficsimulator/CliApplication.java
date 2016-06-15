@@ -3,64 +3,131 @@ package de.fhms.pvr.trafficsimulator;
 
 import de.fhms.pvr.trafficsimulator.system.TrafficSimulator;
 import de.fhms.pvr.trafficsimulator.system.TrafficSimulator.TrafficSimulatorBuilder;
+import de.fhms.pvr.trafficsimulator.system.Vehicle;
 import de.fhms.pvr.trafficsimulator.system.measure.TimeMeasureController;
 import de.fhms.pvr.trafficsimulator.system.measure.TimeMeasureType;
+import de.fhms.pvr.trafficsimulator.system.util.StreetConfigurationParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Arrays;
 
 public class CliApplication {
 
     private static final Logger LOG = LogManager.getLogger(CliApplication.class);
 
+
+    private static final double SWITCH_PROBABILITY = 0.5;
+
+    private static final double SLOW_DAWDLE_PROBABILTY = 0.2;
+
+    private static final double FAST_DAWDLE_PROBABILTY = 0.2;
+
+
+
     public static void main(String[] args) {
-        int trackAmount;
-        int sectionAmount;
-        int iterations;
-        double p0;
-        double p;
-        double rho;
-        double c;
-        int workerAmount;
-        int taskAmount;
-        if (args.length == 9) {
-            trackAmount = Integer.valueOf(args[0]);
-            sectionAmount = Integer.valueOf(args[1]);
-            iterations = Integer.valueOf(args[2]);
-            p0 = Double.valueOf(args[3]);
-            p = Double.valueOf(args[4]);
-            c = Double.valueOf(args[5]);
-            rho = Double.valueOf(args[6]);
-            workerAmount = Integer.valueOf(args[7]);
-            taskAmount = Integer.valueOf(args[8]);
-        } else {
-            trackAmount = 2;
-            sectionAmount = 1000;
-            iterations = 1000;
-            p0 = 0.2;
-            p = 0.2;
-            c = 0.5;
-            rho = 0.4;
-            workerAmount = 1;
-            taskAmount = 1;
+
+        String streetConfigurationsPath = null;
+        if (args.length == 1) {
+            streetConfigurationsPath = args[0];
         }
 
-        TrafficSimulatorBuilder builder = new TrafficSimulatorBuilder(trackAmount, sectionAmount);
-        TrafficSimulator trafficSimulator = builder.withSlowDawdleProbability(p0)
-                .withFastDawdleProbability(p).withSwitchProbability(c).withRelativeVehicleDensity(rho)
-                .withWorkerAmount(workerAmount).withTaskAmount(taskAmount).build();
-        for (int i = 0; i < iterations; i++) {
-            trafficSimulator.iterate();
+        File resultsFile = new File("results.csv");
+        if (resultsFile.exists()) {
+            System.exit(-1);
+        }
+        try {
+            resultsFile.createNewFile();
+        } catch (IOException e) {
+                e.printStackTrace();
         }
 
-        trafficSimulator.shutdown();
+        int runtimes = 3;
+        int[] worker = {1, 2, 4, 8, 12};
+        int[] tasks = {1, 4, 8, 16, 24};
+        int iterations = 1000;
 
-        TimeMeasureController controller = trafficSimulator.getTimeMeasureController();
+        TrafficSimulatorBuilder builder;
 
-        LOG.info("Sigma:\t" + controller.getMeasuredTimeFor(TimeMeasureType.SIGMA));
+        TrafficSimulator trafficSimulator;
 
-        LOG.info("Phi:\t" + controller.getMeasuredTimeFor(TimeMeasureType.PHI));
 
-        LOG.info("Kappa:\t" + controller.getMeasuredTimeFor(TimeMeasureType.KAPPA));
+
+        File file = new File(streetConfigurationsPath);
+        for (File f: file.listFiles()) {
+            System.out.println();
+
+
+            try {
+                Vehicle[][] street = StreetConfigurationParser.parseStreetConfigurationFrom(f);
+                builder = new TrafficSimulatorBuilder(street);
+                builder.withSwitchProbability(SWITCH_PROBABILITY)
+                        .withSlowDawdleProbability(SLOW_DAWDLE_PROBABILTY)
+                        .withFastDawdleProbability(FAST_DAWDLE_PROBABILTY);
+
+                for (int i = 0; i < worker.length; i++) {
+                    trafficSimulator = builder.withWorkerAmount(worker[i])
+                            .withAbsoluteVehicleDensity(countVehicles(street)).withTaskAmount(tasks[i]).build();
+
+                    for (int j = 0; j < runtimes; j++) {
+                        trafficSimulator = builder.build();
+                        for (int k = 0; k < iterations; k++) {
+                            trafficSimulator.iterate();
+                        }
+                        writeResults(trafficSimulator, resultsFile);
+                        trafficSimulator.shutdown();
+                    }
+
+
+                }
+
+
+
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+
+    private static void writeResults(TrafficSimulator trafficSimulator, File file) {
+        TimeMeasureController timeMeasureController = trafficSimulator.getTimeMeasureController();
+        LOG.info(trafficSimulator.getSectionAmount() + "," + trafficSimulator.getTrackAmount() + ","
+        + trafficSimulator.getVehicleAmount() + "," + trafficSimulator.getWorkerAmount()
+        + "," + trafficSimulator.getTaskAmount() + "," + timeMeasureController.getMeasuredTimeFor(TimeMeasureType.SIGMA)
+                + "," + timeMeasureController.getMeasuredTimeFor(TimeMeasureType.PHI) + ","
+                + timeMeasureController.getMeasuredTimeFor(TimeMeasureType.KAPPA));
+
+        BufferedWriter writer = null;
+        try {
+            writer = new BufferedWriter(new FileWriter(file,true));
+            writer.append(String.valueOf(trafficSimulator.getSectionAmount()) + "," + String.valueOf(trafficSimulator.getTrackAmount()) + ","
+                    + String.valueOf(trafficSimulator.getVehicleAmount()) + "," + String.valueOf(trafficSimulator.getWorkerAmount())
+                    + "," + String.valueOf(trafficSimulator.getTaskAmount()) + "," + String.valueOf(timeMeasureController.getMeasuredTimeFor(TimeMeasureType.SIGMA))
+                    + "," + String.valueOf(timeMeasureController.getMeasuredTimeFor(TimeMeasureType.PHI)) + ","
+                    + String.valueOf(timeMeasureController.getMeasuredTimeFor(TimeMeasureType.KAPPA)) + "\r\n");
+            writer.close();
+        } catch (IOException e) {
+            LOG.fatal(e.getMessage());
+        }
+
+    }
+
+    private static int countVehicles(Vehicle[][] street) {
+        int count = 0;
+        for (int i = 0; i < street.length; i++) {
+            for (int j = 0; j < street[i].length; j++) {
+                if (street[i][j] != null) {
+                    count++;
+                }
+            }
+        }
+        return count;
     }
 
 }
