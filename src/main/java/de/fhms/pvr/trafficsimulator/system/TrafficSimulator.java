@@ -45,15 +45,18 @@ public class TrafficSimulator {
     private ArrayList<SimulationTask> trackSwitchingTasks;
 
     private TrafficSimulator(TrafficSimulatorBuilder builder) {
+        this.timeMeasureController = new TimeMeasureController();
+
+        // Erzeugung der einzelnen Objekte
+        this.timeMeasureController.startOrResume(SIGMA);
         this.switchProbability = builder.switchProbability;
         this.slowDawdleProbability = builder.slowDawdleProbability;
         this.fastDawdleProbability = builder.fastDawdleProbability;
-        this.timeMeasureController = new TimeMeasureController();
         this.driveActionTasks = new ArrayList<>();
         this.movementTasks = new ArrayList<>();
         this.trackSwitchingTasks = new ArrayList<>();
         this.workerAmount = builder.workerAmount;
-        this.executorService = Executors.newFixedThreadPool(workerAmount);
+
 
         if(builder.vehicleAmount == 0) {
             this.vehicleAmount = (int) ((double) builder.trackAmount * builder.sectionAmount * builder.vehicleDensity);
@@ -66,7 +69,14 @@ public class TrafficSimulator {
         } else {
             createRandomStreet(builder.trackAmount, builder.sectionAmount, builder.vehicleDensity);
         }
+        this.timeMeasureController.suspend(SIGMA);
+
+
+        // Erzeugung der ExecutorService und der einzelnen Tasks
+        timeMeasureController.startOrResume(KAPPA);
+        this.executorService = Executors.newFixedThreadPool(workerAmount);
         fillTaskLists(builder.sectionAmount, builder.taskAmount);
+        timeMeasureController.suspend(KAPPA);
     }
 
     private void createRandomStreet(int trackAmount, int sectionAmount, double vehicleDensity) {
@@ -130,7 +140,9 @@ public class TrafficSimulator {
     }
 
     public void shutdown() {
+        this.timeMeasureController.startOrResume(SIGMA);
         this.executorService.shutdown();
+        this.timeMeasureController.suspend(SIGMA);
     }
 
     public Vehicle[][] getStreet() {
