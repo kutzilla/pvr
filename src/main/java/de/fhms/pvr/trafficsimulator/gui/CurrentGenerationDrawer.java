@@ -49,6 +49,11 @@ public class CurrentGenerationDrawer implements Callable<Boolean> {
     @Override
     public Boolean call() {
         yGraph = iteration *trackAmount;
+        //Canvas leeren falls Ende erreicht wurde und erneut von oben anfangen
+        if( yGraph%gcStateView.getCanvas().getHeight()==0){
+            gcStateView.clearRect(0, 0, gcStateView.getCanvas().getWidth(), gcStateView.getCanvas().getHeight());
+            gcFlowView.clearRect(0, 0, gcFlowView.getCanvas().getWidth(), gcFlowView.getCanvas().getHeight());
+        }
         double x;
         double y = lineWidth + padding;
         Color c = null;
