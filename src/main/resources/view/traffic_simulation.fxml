@@ -73,9 +73,15 @@
                                           <Font name="System Bold" size="13.0" />
                                        </font>
                                     </Label>
-                                    <TextField fx:id="txtFrom" prefHeight="27.0" prefWidth="61.0" GridPane.columnIndex="4" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                                    <TextField fx:id="txtFrom" prefHeight="27.0" prefWidth="61.0" GridPane.columnIndex="4" GridPane.columnSpan="2" GridPane.rowIndex="2">
+                                       <tooltip>
+                                          <Tooltip text="Die maximal darstellbare Anzahl von Straßenabschnitten beträgt 2100." />
+                                       </tooltip></TextField>
                                     <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="22.0" prefWidth="219.0" text="Staßenabschnitte anzeigen:" textAlignment="RIGHT" GridPane.columnSpan="4" GridPane.rowIndex="2" />
-                                    <TextField fx:id="txtTo" prefHeight="25.0" prefWidth="64.0" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                                    <TextField fx:id="txtTo" prefHeight="25.0" prefWidth="64.0" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="2">
+                                       <tooltip>
+                                          <Tooltip text="Die maximal darstellbare Anzahl von Straßenabschnitten beträgt 2100." />
+                                       </tooltip></TextField>
                                     <Label alignment="CENTER" prefHeight="42.0" prefWidth="68.0" text="bis" textFill="DIMGRAY" GridPane.columnIndex="6" GridPane.rowIndex="2" />
                                  </children>
                                  <columnConstraints>
@@ -114,6 +120,7 @@
                                     <TextField fx:id="txtP" prefHeight="27.0" prefWidth="31.0" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="2" />
                                     <TextField fx:id="txtP0" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="4" />
                                     <TextField fx:id="txtSwitchProb" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="6" />
+                                    <TextFlow prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="13" />
                                  </children>
                                  <columnConstraints>
                                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -162,7 +169,10 @@
                                     <TextField fx:id="txtAbsoluteRho" prefHeight="25.0" prefWidth="57.0" GridPane.columnIndex="8" GridPane.columnSpan="2" GridPane.rowIndex="5">
                                        <GridPane.margin>
                                           <Insets top="10.0" />
-                                       </GridPane.margin></TextField>
+                                       </GridPane.margin>
+                                       <tooltip>
+                                          <Tooltip text="Absolute Anzahl an Fahrzeugen auf beiden Spuren." />
+                                       </tooltip></TextField>
                                     <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="24.0" prefWidth="260.0" text="Anzahl der Spuren:" textAlignment="RIGHT" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="7" />
                                     <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="24.0" prefWidth="248.0" text="Anzahl der Spurabschnitte:" textAlignment="RIGHT" GridPane.columnIndex="2" GridPane.columnSpan="4" GridPane.rowIndex="9" />
                                     <TextField fx:id="txtTracks" GridPane.columnIndex="8" GridPane.columnSpan="2" GridPane.rowIndex="7" />
@@ -179,7 +189,10 @@
                                        </GridPane.margin>
                                     </RadioButton>
                                     <RadioButton fx:id="rbtnRelativeRho" mnemonicParsing="false" prefHeight="17.0" prefWidth="45.0" selected="true" text="rel." toggleGroup="$rho" GridPane.columnIndex="6" GridPane.columnSpan="2" GridPane.rowIndex="4" />
-                                    <TextField fx:id="txtRelativeRho" GridPane.columnIndex="8" GridPane.columnSpan="2" GridPane.rowIndex="4" />
+                                    <TextField fx:id="txtRelativeRho" GridPane.columnIndex="8" GridPane.columnSpan="2" GridPane.rowIndex="4">
+                                       <tooltip>
+                                          <Tooltip text="Relative Fahrzeugdichte rho, z.B. 0.2." />
+                                       </tooltip></TextField>
                                  </children>
                                  <columnConstraints>
                                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -223,7 +236,11 @@
                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                 </rowConstraints>
                                  <children>
-                                    <Button mnemonicParsing="false" onAction="#resetToDefault" prefHeight="29.0" prefWidth="199.0" text="Einstellungen zurücksetzen" GridPane.columnIndex="1" GridPane.columnSpan="2" />
+                                    <Button mnemonicParsing="false" onAction="#resetToDefault" prefHeight="29.0" prefWidth="199.0" text="Einstellungen zurücksetzen" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="1">
+                                       <GridPane.margin>
+                                          <Insets bottom="10.0" />
+                                       </GridPane.margin></Button>
+                                    <Label text="*Per MouseOver über die Eingabefelder können zusätzliche Informationen eingeholt werden." GridPane.columnIndex="1" GridPane.columnSpan="2" />
                                  </children>
                                  <GridPane.margin>
                                     <Insets />
