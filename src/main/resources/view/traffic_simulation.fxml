@@ -12,7 +12,7 @@
 
 <AnchorPane prefHeight="653.0" prefWidth="796.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.fhms.pvr.trafficsimulator.gui.ViewController">
    <children>
-      <TabPane id="tabPane" fx:id="tabPaneRoot" layoutY="28.0" prefHeight="600.0" prefWidth="800.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
+      <TabPane id="tabPane" fx:id="tabPaneRoot" layoutY="28.0" prefHeight="650.0" prefWidth="800.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
         <tabs>
             <Tab text="Konfiguration">
               <content>
@@ -73,10 +73,10 @@
                                           <Font name="System Bold" size="13.0" />
                                        </font>
                                     </Label>
-                                    <TextField fx:id="txtFrom" prefHeight="27.0" prefWidth="61.0" GridPane.columnIndex="6" GridPane.rowIndex="2" />
-                                    <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="22.0" prefWidth="219.0" text="Staßenabschnitte anzeigen:" textAlignment="RIGHT" GridPane.columnSpan="5" GridPane.rowIndex="2" />
-                                    <TextField fx:id="txtTo" prefHeight="27.0" prefWidth="61.0" GridPane.columnIndex="8" GridPane.rowIndex="2" />
-                                    <Label alignment="CENTER" prefHeight="42.0" prefWidth="68.0" text="bis" textFill="DIMGRAY" GridPane.columnIndex="7" GridPane.rowIndex="2" />
+                                    <TextField fx:id="txtFrom" prefHeight="27.0" prefWidth="61.0" GridPane.columnIndex="4" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                                    <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="22.0" prefWidth="219.0" text="Staßenabschnitte anzeigen:" textAlignment="RIGHT" GridPane.columnSpan="4" GridPane.rowIndex="2" />
+                                    <TextField fx:id="txtTo" prefHeight="25.0" prefWidth="64.0" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                                    <Label alignment="CENTER" prefHeight="42.0" prefWidth="68.0" text="bis" textFill="DIMGRAY" GridPane.columnIndex="6" GridPane.rowIndex="2" />
                                  </children>
                                  <columnConstraints>
                                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -157,16 +157,29 @@
                                           <ToggleGroup fx:id="streetOption" />
                                        </toggleGroup>
                                     </RadioButton>
-                                    <RadioButton fx:id="rbtnExistingConfig" mnemonicParsing="false" prefHeight="25.0" prefWidth="288.0" text="Vorhandene Konfiguration" toggleGroup="$streetOption" GridPane.columnIndex="1" GridPane.columnSpan="6" GridPane.rowIndex="10" />
-                                    <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="24.0" prefWidth="275.0" text="Fahrzeugdichte (ρ):" textAlignment="RIGHT" GridPane.columnSpan="6" GridPane.rowIndex="4" />
-                                    <TextField fx:id="txtRho" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="4" />
-                                    <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="24.0" prefWidth="260.0" text="Anzahl der Spuren:" textAlignment="RIGHT" GridPane.columnSpan="6" GridPane.rowIndex="6" />
-                                    <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="24.0" prefWidth="248.0" text="Anzahl der Spurabschnitte:" textAlignment="RIGHT" GridPane.columnSpan="6" GridPane.rowIndex="8" />
-                                    <TextField fx:id="txtTracks" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="6" />
-                                    <TextField fx:id="txtSectionAmount" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="8" />
-                                    <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="24.0" prefWidth="241.0" text="Datei:" textAlignment="RIGHT" GridPane.columnSpan="3" GridPane.rowIndex="12" />
-                                    <Button fx:id="btnChooseConfigurationFile" mnemonicParsing="false" onAction="#chooseConfigurationFile" prefHeight="27.0" prefWidth="173.0" text="Öffnen" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="12" />
+                                    <RadioButton fx:id="rbtnExistingConfig" mnemonicParsing="false" prefHeight="25.0" prefWidth="288.0" text="Vorhandene Konfiguration" toggleGroup="$streetOption" GridPane.columnIndex="1" GridPane.columnSpan="6" GridPane.rowIndex="12" />
+                                    <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="24.0" prefWidth="275.0" text="Fahrzeugdichte (ρ):" textAlignment="RIGHT" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="4" />
+                                    <TextField fx:id="txtAbsoluteRho" prefHeight="25.0" prefWidth="57.0" GridPane.columnIndex="8" GridPane.columnSpan="2" GridPane.rowIndex="5">
+                                       <GridPane.margin>
+                                          <Insets top="10.0" />
+                                       </GridPane.margin></TextField>
+                                    <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="24.0" prefWidth="260.0" text="Anzahl der Spuren:" textAlignment="RIGHT" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="7" />
+                                    <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="24.0" prefWidth="248.0" text="Anzahl der Spurabschnitte:" textAlignment="RIGHT" GridPane.columnIndex="2" GridPane.columnSpan="4" GridPane.rowIndex="9" />
+                                    <TextField fx:id="txtTracks" GridPane.columnIndex="8" GridPane.columnSpan="2" GridPane.rowIndex="7" />
+                                    <TextField fx:id="txtSectionAmount" GridPane.columnIndex="8" GridPane.columnSpan="2" GridPane.rowIndex="9" />
+                                    <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="24.0" prefWidth="241.0" text="Datei:" textAlignment="RIGHT" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="14" />
+                                    <Button fx:id="btnChooseConfigurationFile" mnemonicParsing="false" onAction="#chooseConfigurationFile" prefHeight="27.0" prefWidth="173.0" text="Öffnen" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="14" />
                                     <Label fx:id="lblFileName" alignment="CENTER_RIGHT" prefHeight="24.0" prefWidth="178.0" textFill="DIMGRAY" GridPane.columnIndex="3" GridPane.columnSpan="4" GridPane.rowIndex="12" />
+                                    <RadioButton fx:id="rbtnAbsoluteRho" mnemonicParsing="false" prefHeight="17.0" prefWidth="56.0" text="abs" GridPane.columnIndex="6" GridPane.columnSpan="2" GridPane.rowIndex="5">
+                                       <toggleGroup>
+                                          <ToggleGroup fx:id="rho" />
+                                       </toggleGroup>
+                                       <GridPane.margin>
+                                          <Insets top="10.0" />
+                                       </GridPane.margin>
+                                    </RadioButton>
+                                    <RadioButton fx:id="rbtnRelativeRho" mnemonicParsing="false" prefHeight="17.0" prefWidth="45.0" selected="true" text="rel." toggleGroup="$rho" GridPane.columnIndex="6" GridPane.columnSpan="2" GridPane.rowIndex="4" />
+                                    <TextField fx:id="txtRelativeRho" GridPane.columnIndex="8" GridPane.columnSpan="2" GridPane.rowIndex="4" />
                                  </children>
                                  <columnConstraints>
                                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -174,6 +187,7 @@
                                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="15.0" prefWidth="100.0" />
                                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />

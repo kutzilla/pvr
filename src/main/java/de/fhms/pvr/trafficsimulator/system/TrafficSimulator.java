@@ -54,7 +54,12 @@ public class TrafficSimulator {
         this.trackSwitchingTasks = new ArrayList<>();
         this.workerAmount = builder.workerAmount;
         this.executorService = Executors.newFixedThreadPool(workerAmount);
-        this.vehicleAmount = (int) ((double) builder.trackAmount * builder.sectionAmount * builder.vehicleDensity);
+
+        if(builder.vehicleAmount == 0) {
+            this.vehicleAmount = (int) ((double) builder.trackAmount * builder.sectionAmount * builder.vehicleDensity);
+        }else{
+            this.vehicleAmount = builder.vehicleAmount;
+        }
 
         if (builder.street != null) {
             this.street = builder.street;
@@ -173,6 +178,8 @@ public class TrafficSimulator {
 
         private double vehicleDensity;
 
+        private int vehicleAmount;
+
         private int workerAmount;
 
         private int taskAmount;
@@ -185,13 +192,13 @@ public class TrafficSimulator {
             this.taskAmount = 1;
         }
 
-        public TrafficSimulatorBuilder(int trackAmount, int sectionAmount, double vehicleDensity) {
+        public TrafficSimulatorBuilder(int trackAmount, int sectionAmount) {
             this.trackAmount = trackAmount;
             this.sectionAmount = sectionAmount;
-            this.vehicleDensity = vehicleDensity;
             this.workerAmount = 1;
             this.taskAmount = 1;
         }
+
 
         public TrafficSimulatorBuilder withSwitchProbability(double switchProbability) {
             this.switchProbability = switchProbability;
@@ -205,6 +212,16 @@ public class TrafficSimulator {
 
         public TrafficSimulatorBuilder withSlowDawdleProbability(double slowDawdleProbability) {
             this.slowDawdleProbability = slowDawdleProbability;
+            return this;
+        }
+
+        public TrafficSimulatorBuilder withAbsoluteVehicleDensity(int  vehicleAmount){
+            this.vehicleAmount = vehicleAmount;
+            return this;
+        }
+
+        public TrafficSimulatorBuilder withRelativeVehicleDensity(double vehicleDensity){
+            this.vehicleDensity = vehicleDensity;
             return this;
         }
 

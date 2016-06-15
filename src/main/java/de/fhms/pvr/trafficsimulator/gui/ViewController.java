@@ -6,6 +6,8 @@ import de.fhms.pvr.trafficsimulator.system.TrafficSimulator.TrafficSimulatorBuil
 import de.fhms.pvr.trafficsimulator.system.measure.TimeMeasureController;
 import de.fhms.pvr.trafficsimulator.system.util.StreetConfigurationParser;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -74,7 +76,10 @@ public class ViewController implements Initializable {
     TextField txtP0;
 
     @FXML
-    TextField txtRho;
+    TextField txtRelativeRho;
+
+    @FXML
+    TextField txtAbsoluteRho;
 
     @FXML
     TextField txtSwitchProb;
@@ -125,6 +130,12 @@ public class ViewController implements Initializable {
     RadioButton rbtnExistingConfig;
 
     @FXML
+    RadioButton rbtnAbsoluteRho;
+
+    @FXML
+    RadioButton rbtnRelativeRho;
+
+    @FXML
     Label lblWorker;
 
     @FXML
@@ -161,7 +172,6 @@ public class ViewController implements Initializable {
             int sectionAmount = Integer.parseInt(txtSectionAmount.getText());
             double p0 = Double.parseDouble(txtP0.getText());
             double p = Double.parseDouble(txtP.getText());
-            double rho = Double.parseDouble(txtRho.getText());
             double c = Double.parseDouble(txtSwitchProb.getText());
             int iterations = Integer.parseInt(txtIterations.getText());
             int from = Integer.parseInt(txtFrom.getText());
@@ -179,10 +189,20 @@ public class ViewController implements Initializable {
                     e.printStackTrace();
                 }
             } else {
-                builder = new TrafficSimulatorBuilder(trackAmount, sectionAmount, rho);
+                builder = new TrafficSimulatorBuilder(trackAmount, sectionAmount);
             }
-            trafficSimulator = builder.withSwitchProbability(c).withSlowDawdleProbability(p0)
-                    .withFastDawdleProbability(p).withWorkerAmount(workerAmount).withTaskAmount(taskAmount).build();
+
+
+
+            if(rbtnRelativeRho.isSelected()) {
+                double rho = Double.parseDouble(txtRelativeRho.getText());
+                trafficSimulator = builder.withSwitchProbability(c).withSlowDawdleProbability(p0).withRelativeVehicleDensity(rho)
+                        .withFastDawdleProbability(p).withWorkerAmount(workerAmount).withTaskAmount(taskAmount).build();
+            }else{
+                int vehicleAmount = Integer.parseInt(txtAbsoluteRho.getText());
+                trafficSimulator = builder.withSwitchProbability(c).withSlowDawdleProbability(p0).withAbsoluteVehicleDensity(vehicleAmount)
+                        .withFastDawdleProbability(p).withWorkerAmount(workerAmount).withTaskAmount(taskAmount).build();
+            }
 
             SimulateTask simulateTask = initSimulateTask(iterations, trafficSimulator, from, to);
 
@@ -250,6 +270,24 @@ public class ViewController implements Initializable {
         scrollPaneFlowView.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         scrollPaneFlowView.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         initDefaultValues();
+
+        //Listener für die Radio-Buttons zur Wahl der Fahrzeugdichte
+        final ToggleGroup vehicleDensityToggleGroup = rbtnRelativeRho.getToggleGroup();
+        vehicleDensityToggleGroup.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
+            @Override
+            public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
+                if(vehicleDensityToggleGroup.getSelectedToggle() != null){
+                    if(newValue.selectedProperty().getBean().equals(rbtnRelativeRho)){
+                        txtRelativeRho.setDisable(false);
+                        txtAbsoluteRho.setDisable(true);
+                    }else{
+                        txtAbsoluteRho.setDisable(false);
+                        txtRelativeRho.setDisable(true);
+                    }
+
+                }
+            }
+        });
     }
 
     public void stopSimulation(Event event) {
@@ -285,7 +323,7 @@ public class ViewController implements Initializable {
         txtTracks.setText("2");
         txtSectionAmount.setText("1000");
         txtSwitchProb.setText("0.5");
-        txtRho.setText("0.4");
+        txtRelativeRho.setText("0.4");
         txtP.setText("0.2");
         txtP0.setText("0.2");
         txtIterations.setText("1000");
@@ -293,6 +331,8 @@ public class ViewController implements Initializable {
         txtTo.setText("100");
         txtWorkerAmount.setText("1");
         txtTaskAmount.setText("1");
+        txtAbsoluteRho.setDisable(true);
+        rbtnRelativeRho.setSelected(true);
     }
 
     /**
@@ -373,13 +413,20 @@ public class ViewController implements Initializable {
                 && isNumeric(txtIterations.getText())
                 && isNumeric(txtP.getText())
                 && isNumeric(txtP0.getText())
-                && isNumeric(txtRho.getText())
                 && isNumeric(txtSwitchProb.getText())
                 && isNumeric(txtSectionAmount.getText())
                 && isNumeric(txtFrom.getText())
                 && isNumeric(txtTo.getText())
                 && isNumeric(txtWorkerAmount.getText())
                 && isNumeric(txtTaskAmount.getText())) {
+
+            if(rbtnRelativeRho.isSelected()) {
+                if (!isNumeric(txtRelativeRho.getText())) return false;
+            }
+
+            if(rbtnAbsoluteRho.isSelected()) {
+                if (!isNumeric(txtAbsoluteRho.getText())) return false;
+            }
 
             //Prüfung "von" "bis" des zu betrachteten Straßenabschnittes
             if (Double.parseDouble(txtFrom.getText()) >= Double.parseDouble(txtTo.getText())) return false;
@@ -389,7 +436,7 @@ public class ViewController implements Initializable {
 
             //Prüfung Wahrscheinlichkeiten
             if (Double.parseDouble(txtP0.getText()) > 1.0 || Double.parseDouble(txtP.getText()) > 1.0
-                    || Double.parseDouble(txtRho.getText()) > 1.0
+                    || Double.parseDouble(txtRelativeRho.getText()) > 1.0
                     || Double.parseDouble(txtSwitchProb.getText()) > 1.0) {
                 return false;
             }

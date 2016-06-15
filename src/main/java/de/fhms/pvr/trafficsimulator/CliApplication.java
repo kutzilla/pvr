@@ -20,9 +20,9 @@ public class CliApplication {
         double c = 0.5;
         int workerAmount = 2;
         int taskAmount = 2;
-        TrafficSimulatorBuilder builder = new TrafficSimulatorBuilder(trackAmount, sectionAmount, rho);
+        TrafficSimulatorBuilder builder = new TrafficSimulatorBuilder(trackAmount, sectionAmount);
         TrafficSimulator trafficSimulator = builder.withSlowDawdleProbability(p0)
-                .withFastDawdleProbability(p).withSwitchProbability(c)
+                .withFastDawdleProbability(p).withSwitchProbability(c).withRelativeVehicleDensity(rho)
                 .withWorkerAmount(workerAmount).withTaskAmount(taskAmount).build();
         for (int i = 0; i < 1000; i++) {
             trafficSimulator.iterate();

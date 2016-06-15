@@ -19,7 +19,7 @@ public class GuiApplication extends Application {
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("/view/traffic_simulation.fxml"));
         primaryStage.setTitle("Verkehrssimulation");
-        primaryStage.setScene(new Scene(root, 800, 600));
+        primaryStage.setScene(new Scene(root, 800, 650));
         LOG.info("Initialisiere GUI");
         primaryStage.show();
     }
