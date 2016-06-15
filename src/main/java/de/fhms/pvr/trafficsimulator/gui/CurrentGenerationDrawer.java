@@ -25,7 +25,7 @@ public class CurrentGenerationDrawer implements Callable<Boolean> {
     //Abstände zwischen den Autopixeln auf der Live-Ansicht
     private final double padding;
     //Aktuelle Iteration
-    private volatile int iteration;
+    private int iteration;
     private double xGraph;
     private double yGraph;
 
@@ -48,7 +48,7 @@ public class CurrentGenerationDrawer implements Callable<Boolean> {
 
     @Override
     public Boolean call() {
-        yGraph = iteration;
+        yGraph = iteration *trackAmount;
         double x;
         double y = lineWidth + padding;
         Color c = null;
@@ -69,8 +69,8 @@ public class CurrentGenerationDrawer implements Callable<Boolean> {
                         gcFlowView.setFill(c);
                     }
                     gcCarCanvas.fillRect(x, y, pixelSize, pixelSize);
-                    gcStateView.fillRect(xGraph, yGraph, 1.0, 1.0);
-                    gcFlowView.fillRect(xGraph, yGraph, 1.0, 1.0);
+                    gcStateView.fillRect(xGraph, yGraph%gcStateView.getCanvas().getHeight(), 1.0, 1.0);
+                    gcFlowView.fillRect(xGraph, yGraph%gcFlowView.getCanvas().getHeight(), 1.0, 1.0);
 
                     x += pixelSize + padding;
                     xGraph += 1.0;
