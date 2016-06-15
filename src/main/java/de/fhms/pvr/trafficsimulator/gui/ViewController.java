@@ -29,7 +29,7 @@ import java.util.concurrent.FutureTask;
 import static de.fhms.pvr.trafficsimulator.system.measure.TimeMeasureType.*;
 
 /**
- * @author Dave
+ *
  */
 public class ViewController implements Initializable {
 
@@ -154,7 +154,6 @@ public class ViewController implements Initializable {
     private File configurationFile;
 
 
-
     public void startSimulation(Event event) {
         if (validateInputFields()) {
             //Initialisierung der Parameter
@@ -201,6 +200,14 @@ public class ViewController implements Initializable {
         return simulateTask;
     }
 
+    /**
+     * Initialisierung des Simulationstabs
+     *
+     * @param trackAmount
+     * @param from
+     * @param to
+     * @param iterations
+     */
     private void initSimulationTab(int trackAmount, int from, int to, int iterations) {
         drawStreet(canvasStreetLayer.getGraphicsContext2D(), trackAmount, LINE_WIDTH, from, to);
 
@@ -209,12 +216,15 @@ public class ViewController implements Initializable {
         scrollPaneSectionView.setContent(canvasGroup);
         //Statusdarstellung
         scrollPaneStateView.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        canvasStateView.setHeight(iterations);
+        int height = iterations;
+        //Vermeidung von Nullpointern bei zu großem Wert für die Höhe der Canvas'
+        if (height > 4000) height = 4000;
+        canvasStateView.setHeight(height);
         canvasStateView.setWidth(to - from);
         scrollPaneStateView.setContent(canvasStateView);
         //Flussdarstellung
         scrollPaneFlowView.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        canvasFlowView.setHeight(iterations);
+        canvasFlowView.setHeight(height);
         canvasFlowView.setWidth(to - from);
         scrollPaneFlowView.setContent(canvasFlowView);
 
@@ -258,7 +268,7 @@ public class ViewController implements Initializable {
     public void chooseConfigurationFile(Event event) {
         LOG.debug("Dateiauswahl angeklickt");
         FileChooser fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Configuration File (*.csv)","*.csv"));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Configuration File (*.csv)", "*.csv"));
         File file = fileChooser.showOpenDialog(null);
 
         if (file != null) {
@@ -299,10 +309,13 @@ public class ViewController implements Initializable {
     private void drawStreet(GraphicsContext gc, int trackAmount, double lineWidth, int from, int to) {
         //Canvas zurücksetzen
         this.resetCanvas();
+
+        int pixelSize = calculatePixelSize(from,to);
+
         //Straßenfläche
         gc.setFill(Color.DARKGRAY);
-        double streetHeight = PIXEL_SIZE * trackAmount + 2 * lineWidth + 2 * PADDING + ((trackAmount - 1) * lineWidth + PADDING) + 1;
-        double streetWidth = (to - from + PADDING) * PIXEL_SIZE;
+        double streetHeight = pixelSize * trackAmount + 2 * lineWidth + 2 * PADDING + ((trackAmount - 1) * lineWidth + PADDING) + 1;
+        double streetWidth = (to - from + PADDING) * pixelSize;
 
         this.canvasStreetLayer.setWidth(streetWidth);
         this.canvasCarLayer.setWidth(streetWidth);
@@ -324,9 +337,9 @@ public class ViewController implements Initializable {
         double y = lineWidth / 4 + PADDING;
         for (int i = 0; i < trackAmount - 1; i++) {
             for (int j = 0; j <= streetWidth; j += 6) {
-                gc.strokeLine(j, y + PIXEL_SIZE + PADDING + lineWidth, j - 4, y + PIXEL_SIZE + PADDING + lineWidth);
+                gc.strokeLine(j, y + pixelSize + PADDING + lineWidth, j - 4, y + pixelSize + PADDING + lineWidth);
             }
-            y += PIXEL_SIZE + lineWidth + PADDING;
+            y += pixelSize + lineWidth + PADDING;
         }
     }
 
@@ -337,7 +350,17 @@ public class ViewController implements Initializable {
      * @return boolean
      */
     private static boolean isNumeric(String str) {
-        return str.matches("-?\\d+(\\.\\d+)?");  //match a number with optional '-' and decimal.
+        return str.matches("\\d+(\\.\\d+)?");  //match a number with optional '-' and decimal.
+    }
+
+    private int calculatePixelSize(int from, int to){
+        int canvasWidth = to-from;
+        if(canvasWidth>1000){
+           return PIXEL_SIZE/4;
+        }else if(canvasWidth > 600){
+            return PIXEL_SIZE/2;
+        }
+        return PIXEL_SIZE;
     }
 
     /**
@@ -357,6 +380,22 @@ public class ViewController implements Initializable {
                 && isNumeric(txtTo.getText())
                 && isNumeric(txtWorkerAmount.getText())
                 && isNumeric(txtTaskAmount.getText())) {
+
+            //Prüfung "von" "bis" des zu betrachteten Straßenabschnittes
+            if (Double.parseDouble(txtFrom.getText()) >= Double.parseDouble(txtTo.getText())) return false;
+
+            //Zu betrachtende Abschnitte prüfen, Aufgrund der Breite der Canvas auf max 2100 begrenzt
+            if((Double.parseDouble(txtTo.getText()) - Double.parseDouble(txtFrom.getText())>2100)) return false;
+
+            //Prüfung Wahrscheinlichkeiten
+            if (Double.parseDouble(txtP0.getText()) > 1.0 || Double.parseDouble(txtP.getText()) > 1.0
+                    || Double.parseDouble(txtRho.getText()) > 1.0
+                    || Double.parseDouble(txtSwitchProb.getText()) > 1.0) {
+                return false;
+            }
+
+            if (Double.parseDouble(txtTo.getText()) > Double.parseDouble(txtSectionAmount.getText())) return false;
+
             return true;
         }
         return false;
@@ -367,12 +406,14 @@ public class ViewController implements Initializable {
         private final int iterations;
         private final int from;
         private final int to;
+        private final int pixelSize;
 
         public SimulateTask(int iterations, TrafficSimulator simulator, int from, int to) {
             this.simulator = simulator;
             this.iterations = iterations;
             this.from = from;
             this.to = to;
+            this.pixelSize = calculatePixelSize(from,to);
         }
 
         @Override
@@ -383,7 +424,7 @@ public class ViewController implements Initializable {
                     CurrentGenerationDrawer drawRunable = new CurrentGenerationDrawer(from, to,
                             simulator.getStreet(),
                             simulator.getStreet().length,
-                            LINE_WIDTH, PADDING, PIXEL_SIZE,
+                            LINE_WIDTH, PADDING, pixelSize,
                             canvasCarLayer.getGraphicsContext2D(),
                             canvasStateView.getGraphicsContext2D(),
                             canvasFlowView.getGraphicsContext2D());
