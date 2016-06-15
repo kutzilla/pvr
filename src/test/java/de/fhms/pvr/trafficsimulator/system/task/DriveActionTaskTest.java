@@ -28,7 +28,7 @@ public class DriveActionTaskTest {
         for (int i = 0; i < testStreet.length; i++) {
             for (int j = 0; j < testStreet[i].length; j++) {
                 if (testStreet[i][j] != null) {
-                    driveActionTask.simulateAcceleration(testStreet[i][j], j, i);
+                    driveActionTask.simulateAcceleration(testStreet[i][j]);
                 }
             }
         }
@@ -74,7 +74,7 @@ public class DriveActionTaskTest {
         for (int i = 0; i < testStreet.length; i++) {
             for (int j = 0; j < testStreet[i].length; j++) {
                 if (testStreet[i][j] != null) {
-                    driveActionTask.simulateDawdling(testStreet[i][j], j, i);
+                    driveActionTask.simulateDawdling(testStreet[i][j]);
                 }
             }
         }
@@ -97,7 +97,7 @@ public class DriveActionTaskTest {
         for (int i = 0; i < testStreet.length; i++) {
             for (int j = 0; j < testStreet[i].length; j++) {
                 if (testStreet[i][j] != null) {
-                    driveActionTask.simulateDawdling(testStreet[i][j], j, i);
+                    driveActionTask.simulateDawdling(testStreet[i][j]);
                 }
             }
         }

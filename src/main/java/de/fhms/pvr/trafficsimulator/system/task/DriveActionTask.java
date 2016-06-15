@@ -13,6 +13,8 @@ public class DriveActionTask extends SimulationTask {
 
     private double slowDawdleProbability;
 
+    private int newX;
+
     public DriveActionTask(Vehicle[][] street, int lowerBorder, int upperBorder,
                            double fastDawdleProbability, double slowDawdleProbability) {
         super(street, lowerBorder, upperBorder);
@@ -24,17 +26,19 @@ public class DriveActionTask extends SimulationTask {
         v.incrementCurrentSpeed();
     }
 
-    protected void simulateDeceleration(Vehicle v, int x, int y) {
+    protected int simulateDeceleration(Vehicle v, int x, int y) {
+        newX = x;
         if (v.getCurrentSpeed() > 0) {
             for (int i = 1; i <= v.getCurrentSpeed(); i++) {
                 if (street[y][(x + i) % street[y].length] != null) {
                     v.setCurrentSpeed(i - 1);
                     LOG.debug("Geschwindigkeit von " + v + " um " + (i - 1) + " verringert");
+                    newX = x + i-1;
                     break;
                 }
             }
         }
-
+        return newX ;
     }
 
     protected void simulateDawdling(Vehicle v) {
@@ -61,7 +65,7 @@ public class DriveActionTask extends SimulationTask {
             for (int x = lowerBorder; x <= upperBorder; x++) {
                 if ((v = street[y][x]) != null) {
                     simulateAcceleration(v);
-                    simulateDeceleration(v, x, y);
+                    x = simulateDeceleration(v, x, y);
                     simulateDawdling(v);
                 }
             }
