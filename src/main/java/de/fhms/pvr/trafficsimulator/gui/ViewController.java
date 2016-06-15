@@ -3,6 +3,7 @@ package de.fhms.pvr.trafficsimulator.gui;
 
 import de.fhms.pvr.trafficsimulator.system.TrafficSimulator;
 import de.fhms.pvr.trafficsimulator.system.TrafficSimulator.TrafficSimulatorBuilder;
+import de.fhms.pvr.trafficsimulator.system.Vehicle;
 import de.fhms.pvr.trafficsimulator.system.measure.TimeMeasureController;
 import de.fhms.pvr.trafficsimulator.system.util.StreetConfigurationParser;
 import javafx.application.Platform;
@@ -22,6 +23,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -41,6 +43,19 @@ public class ViewController implements Initializable {
     private final double PADDING = 1.0;
     private final double LINE_WIDTH = 1.0;
     private volatile boolean isMoving = false;
+
+    private int trackAmount;
+    private int sectionAmount;
+    private double p0;
+    private double p;
+    private double c;
+    private int iterations;
+    private int from;
+    private int to;
+    private int taskAmount;
+    private int workerAmount;
+    private TrafficSimulator trafficSimulator;
+    private TrafficSimulatorBuilder builder;
 
     @FXML
     TabPane tabPaneRoot;
@@ -162,25 +177,40 @@ public class ViewController implements Initializable {
     @FXML
     Label lblIterations;
 
+    @FXML
+    Button btnSaveConfiguration;
+
     private File configurationFile;
 
 
     public void startSimulation(Event event) {
+        this.initSimulation();
+        SimulateTask simulateTask = initSimulateTask(iterations, trafficSimulator, from, to);
+        Thread workerThread = new Thread(simulateTask);
+        this.isMoving = true;
+        workerThread.start();
+        this.enableOrDeactivateStart();
+    }
+
+    /**
+     * Initialisierung der Parameter sowie des Trafficsimulators
+     */
+    private void initSimulation() {
         if (validateInputFields()) {
             //Initialisierung der Parameter
-            int trackAmount = Integer.parseInt(txtTracks.getText());
-            int sectionAmount = Integer.parseInt(txtSectionAmount.getText());
-            double p0 = Double.parseDouble(txtP0.getText());
-            double p = Double.parseDouble(txtP.getText());
-            double c = Double.parseDouble(txtSwitchProb.getText());
-            int iterations = Integer.parseInt(txtIterations.getText());
-            int from = Integer.parseInt(txtFrom.getText());
-            int to = Integer.parseInt(txtTo.getText());
-            int taskAmount = Integer.parseInt(txtTaskAmount.getText());
-            int workerAmount = Integer.parseInt(txtWorkerAmount.getText());
+            trackAmount = Integer.parseInt(txtTracks.getText());
+            sectionAmount = Integer.parseInt(txtSectionAmount.getText());
+            p0 = Double.parseDouble(txtP0.getText());
+            p = Double.parseDouble(txtP.getText());
+            c = Double.parseDouble(txtSwitchProb.getText());
+            iterations = Integer.parseInt(txtIterations.getText());
+            from = Integer.parseInt(txtFrom.getText());
+            to = Integer.parseInt(txtTo.getText());
+            taskAmount = Integer.parseInt(txtTaskAmount.getText());
+            workerAmount = Integer.parseInt(txtWorkerAmount.getText());
 
-            TrafficSimulator trafficSimulator = null;
-            TrafficSimulatorBuilder builder = null;
+            trafficSimulator = null;
+            builder = null;
             if (rbtnExistingConfig.isSelected() && configurationFile != null) {
                 try {
                     builder = new TrafficSimulatorBuilder(StreetConfigurationParser
@@ -193,25 +223,18 @@ public class ViewController implements Initializable {
             }
 
 
-
-            if(rbtnRelativeRho.isSelected()) {
+            if (rbtnRelativeRho.isSelected()) {
                 double rho = Double.parseDouble(txtRelativeRho.getText());
                 trafficSimulator = builder.withSwitchProbability(c).withSlowDawdleProbability(p0).withRelativeVehicleDensity(rho)
                         .withFastDawdleProbability(p).withWorkerAmount(workerAmount).withTaskAmount(taskAmount).build();
-            }else{
+            } else {
                 int vehicleAmount = Integer.parseInt(txtAbsoluteRho.getText());
                 trafficSimulator = builder.withSwitchProbability(c).withSlowDawdleProbability(p0).withAbsoluteVehicleDensity(vehicleAmount)
                         .withFastDawdleProbability(p).withWorkerAmount(workerAmount).withTaskAmount(taskAmount).build();
             }
 
-            SimulateTask simulateTask = initSimulateTask(iterations, trafficSimulator, from, to);
 
             initSimulationTab(trackAmount, from, to, iterations);
-
-            Thread workerThread = new Thread(simulateTask);
-            this.isMoving = true;
-            workerThread.start();
-            this.enableOrDeactivateStart();
         }
     }
 
@@ -277,11 +300,11 @@ public class ViewController implements Initializable {
         vehicleDensityToggleGroup.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
             @Override
             public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
-                if(vehicleDensityToggleGroup.getSelectedToggle() != null){
-                    if(newValue.selectedProperty().getBean().equals(rbtnRelativeRho)){
+                if (vehicleDensityToggleGroup.getSelectedToggle() != null) {
+                    if (newValue.selectedProperty().getBean().equals(rbtnRelativeRho)) {
                         txtRelativeRho.setDisable(false);
                         txtAbsoluteRho.setDisable(true);
-                    }else{
+                    } else {
                         txtAbsoluteRho.setDisable(false);
                         txtRelativeRho.setDisable(true);
                     }
@@ -302,6 +325,53 @@ public class ViewController implements Initializable {
      */
     public void resetToDefault(Event event) {
         this.initDefaultValues();
+    }
+
+    public void saveCurrentConfiguration(Event event){
+        this.initSimulation();
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Configuration File (*.csv)", "*.csv"));
+        fileChooser.setTitle("Konfiguration speichern unter");
+
+        File file = fileChooser.showSaveDialog(null);
+        if(file!=null){
+            this.saveFile(file);
+        }
+
+    }
+
+    private void saveFile(File file){
+        String content="";
+        Vehicle[][] street = trafficSimulator.getStreet();
+        Vehicle tmp;
+        for (int y = 0; y < street.length; y++) {
+            for(int x=0; x< street[y].length; x++){
+                tmp = street[y][x];
+                if(tmp!=null){
+                    content+= tmp.getCurrentSpeed();
+                }
+                content+=",";
+            }
+            content+="\r\n";
+        }
+        try {
+            FileWriter fileWriter = null;
+            fileWriter = new FileWriter(file);
+            fileWriter.write(content);
+            fileWriter.close();
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Konfiguration speichern");
+            alert.setHeaderText("Info");
+            alert.setContentText("Konfiguration erfolgreich gespeichert: " + file.getName());
+            alert.showAndWait();
+
+            configurationFile = file;
+            rbtnExistingConfig.setSelected(true);
+            this.lblFileName.setText(file.getName());
+        } catch (IOException ex) {
+            LOG.error("Speichern nicht erfolgreich: " + ex.getStackTrace());
+        }
     }
 
     public void chooseConfigurationFile(Event event) {
@@ -343,7 +413,7 @@ public class ViewController implements Initializable {
         canvasCarLayer.getGraphicsContext2D().clearRect(0, 0, canvasCarLayer.getWidth(), canvasCarLayer.getHeight());
         canvasStreetLayer.getGraphicsContext2D().clearRect(0, 0, canvasStreetLayer.getWidth(), canvasStreetLayer.getHeight());
         canvasStateView.getGraphicsContext2D().clearRect(0, 0, canvasStateView.getWidth(), canvasStateView.getHeight());
-        canvasFlowView.getGraphicsContext2D().clearRect(0, 0, canvasStateView.getWidth(), canvasStateView.getHeight());
+        canvasFlowView.getGraphicsContext2D().clearRect(0, 0, canvasFlowView.getWidth(), canvasFlowView.getHeight());
     }
 
 
@@ -351,7 +421,7 @@ public class ViewController implements Initializable {
         //Canvas zurücksetzen
         this.resetCanvas();
 
-        int pixelSize = calculatePixelSize(from,to);
+        int pixelSize = calculatePixelSize(from, to);
 
         //Straßenfläche
         gc.setFill(Color.DARKGRAY);
@@ -394,12 +464,12 @@ public class ViewController implements Initializable {
         return str.matches("\\d+(\\.\\d+)?");  //match a number with optional '-' and decimal.
     }
 
-    private int calculatePixelSize(int from, int to){
-        int canvasWidth = to-from;
-        if(canvasWidth>1000){
-           return PIXEL_SIZE/4;
-        }else if(canvasWidth > 600){
-            return PIXEL_SIZE/2;
+    private int calculatePixelSize(int from, int to) {
+        int canvasWidth = to - from;
+        if (canvasWidth > 1000) {
+            return PIXEL_SIZE / 4;
+        } else if (canvasWidth > 600) {
+            return PIXEL_SIZE / 2;
         }
         return PIXEL_SIZE;
     }
@@ -421,11 +491,11 @@ public class ViewController implements Initializable {
                 && isNumeric(txtWorkerAmount.getText())
                 && isNumeric(txtTaskAmount.getText())) {
 
-            if(rbtnRelativeRho.isSelected()) {
+            if (rbtnRelativeRho.isSelected()) {
                 if (!isNumeric(txtRelativeRho.getText())) return false;
             }
 
-            if(rbtnAbsoluteRho.isSelected()) {
+            if (rbtnAbsoluteRho.isSelected()) {
                 if (!isNumeric(txtAbsoluteRho.getText())) return false;
             }
 
@@ -433,7 +503,7 @@ public class ViewController implements Initializable {
             if (Double.parseDouble(txtFrom.getText()) >= Double.parseDouble(txtTo.getText())) return false;
 
             //Zu betrachtende Abschnitte prüfen, Aufgrund der Breite der Canvas auf max 2100 begrenzt
-            if((Double.parseDouble(txtTo.getText()) - Double.parseDouble(txtFrom.getText())>2100)) return false;
+            if ((Double.parseDouble(txtTo.getText()) - Double.parseDouble(txtFrom.getText()) > 2100)) return false;
 
             //Prüfung Wahrscheinlichkeiten
             if (Double.parseDouble(txtP0.getText()) > 1.0 || Double.parseDouble(txtP.getText()) > 1.0
@@ -461,21 +531,21 @@ public class ViewController implements Initializable {
             this.iterations = iterations;
             this.from = from;
             this.to = to;
-            this.pixelSize = calculatePixelSize(from,to);
+            this.pixelSize = calculatePixelSize(from, to);
         }
 
         @Override
         protected Void call() throws Exception {
+            CurrentGenerationDrawer drawRunable = new CurrentGenerationDrawer(from, to,
+                    simulator.getStreet(),
+                    simulator.getStreet().length,
+                    LINE_WIDTH, PADDING, pixelSize,
+                    canvasCarLayer.getGraphicsContext2D(),
+                    canvasStateView.getGraphicsContext2D(),
+                    canvasFlowView.getGraphicsContext2D());
             for (int i = 0; i < iterations; i++) {
                 if (isMoving) {
                     simulator.iterate();
-                    CurrentGenerationDrawer drawRunable = new CurrentGenerationDrawer(from, to,
-                            simulator.getStreet(),
-                            simulator.getStreet().length,
-                            LINE_WIDTH, PADDING, pixelSize,
-                            canvasCarLayer.getGraphicsContext2D(),
-                            canvasStateView.getGraphicsContext2D(),
-                            canvasFlowView.getGraphicsContext2D());
                     drawRunable.setIteration(i);
                     FutureTask<Boolean> drawTask = new FutureTask<>(drawRunable);
                     Platform.runLater(drawTask);
