@@ -22,6 +22,7 @@ import javafx.stage.FileChooser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -184,7 +185,7 @@ public class ViewController implements Initializable {
 
 
     public void startSimulation(Event event) {
-        if(this.initSimulation()) {
+        if (this.initSimulation()) {
             SimulateTask simulateTask = initSimulateTask(iterations, trafficSimulator, from, to);
             Thread workerThread = new Thread(simulateTask);
             this.isMoving = true;
@@ -221,6 +222,7 @@ public class ViewController implements Initializable {
                 }
             } else {
                 builder = new TrafficSimulatorBuilder(trackAmount, sectionAmount);
+                LOG.info("NEW");
             }
 
 
@@ -319,7 +321,7 @@ public class ViewController implements Initializable {
         //Listener für die Radio-Buttons zur Wahl der Straßenkonfiguration
         final ToggleGroup configToggleGroup = rbtnExistingConfig.getToggleGroup();
         configToggleGroup.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
-            if(configToggleGroup.getSelectedToggle()!=null){
+            if (configToggleGroup.getSelectedToggle() != null) {
                 if (newValue.selectedProperty().getBean().equals(rbtnExistingConfig)) {
                     txtAbsoluteRho.setDisable(true);
                     txtRelativeRho.setDisable(true);
@@ -327,7 +329,7 @@ public class ViewController implements Initializable {
                     txtSectionAmount.setDisable(true);
                     rbtnAbsoluteRho.setDisable(true);
                     rbtnRelativeRho.setDisable(true);
-                }else{
+                } else {
                     txtAbsoluteRho.setDisable(false);
                     txtRelativeRho.setDisable(false);
                     txtTracks.setDisable(false);
@@ -352,52 +354,53 @@ public class ViewController implements Initializable {
         this.initDefaultValues();
     }
 
-    public void saveCurrentConfiguration(Event event){
+    public void saveCurrentConfiguration(Event event) {
         this.initSimulation();
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Configuration File (*.csv)", "*.csv"));
         fileChooser.setTitle("Konfiguration speichern unter");
 
         File file = fileChooser.showSaveDialog(null);
-        if(file!=null){
+        if (file != null) {
             this.saveFile(file);
         }
 
     }
 
-    private void saveFile(File file){
-        String content="";
-        Vehicle[][] street = trafficSimulator.getStreet();
-        Vehicle tmp;
-        for (int y = 0; y < street.length; y++) {
-            for(int x=0; x< street[y].length; x++){
-                tmp = street[y][x];
-                if(tmp!=null){
-                    content+= tmp.getCurrentSpeed();
-                }
-                content+=",";
-            }
-            content+="\r\n";
-        }
+    private void saveFile(File file) {
+        BufferedWriter writer = null;
         try {
-            FileWriter fileWriter = null;
-            fileWriter = new FileWriter(file);
-            fileWriter.write(content);
-            fileWriter.close();
-
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Konfiguration speichern");
-            alert.setHeaderText("Info");
-            alert.setContentText("Konfiguration erfolgreich gespeichert: " + file.getName());
-            alert.showAndWait();
-
-            configurationFile = file;
-            rbtnExistingConfig.setSelected(true);
-            this.lblFileName.setText(file.getName());
+            writer = new BufferedWriter(new FileWriter(file));
+            Vehicle[][] street = trafficSimulator.getStreet();
+            Vehicle tmp;
+            for (int y = 0; y < street.length; y++) {
+                for (int x = 0; x < street[y].length; x++) {
+                    tmp = street[y][x];
+                    if (tmp != null) {
+                       writer.write(String.valueOf(tmp.getCurrentSpeed()));
+                    }
+                    if(!(x == street[y].length-1)) {
+                        writer.write(",");
+                    }
+                }
+                writer.write("\r\n");
+            }
+            writer.close();
         } catch (IOException ex) {
             LOG.error("Speichern nicht erfolgreich: " + ex.getStackTrace());
         }
-    }
+
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Konfiguration speichern");
+        alert.setHeaderText("Info");
+        alert.setContentText("Konfiguration erfolgreich gespeichert: " + file.getName());
+        alert.showAndWait();
+
+        configurationFile = file;
+        rbtnExistingConfig.setSelected(true);
+        this.lblFileName.setText(file.getName());
+            }
 
     public void chooseConfigurationFile(Event event) {
         LOG.debug("Dateiauswahl angeklickt");
