@@ -315,6 +315,28 @@ public class ViewController implements Initializable {
                 }
             }
         });
+
+        //Listener für die Radio-Buttons zur Wahl der Straßenkonfiguration
+        final ToggleGroup configToggleGroup = rbtnExistingConfig.getToggleGroup();
+        configToggleGroup.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
+            if(configToggleGroup.getSelectedToggle()!=null){
+                if (newValue.selectedProperty().getBean().equals(rbtnExistingConfig)) {
+                    txtAbsoluteRho.setDisable(true);
+                    txtRelativeRho.setDisable(true);
+                    txtTracks.setDisable(true);
+                    txtSectionAmount.setDisable(true);
+                    rbtnAbsoluteRho.setDisable(true);
+                    rbtnRelativeRho.setDisable(true);
+                }else{
+                    txtAbsoluteRho.setDisable(false);
+                    txtRelativeRho.setDisable(false);
+                    txtTracks.setDisable(false);
+                    txtSectionAmount.setDisable(false);
+                    rbtnAbsoluteRho.setDisable(false);
+                    rbtnRelativeRho.setDisable(false);
+                }
+            }
+        });
     }
 
     public void stopSimulation(Event event) {
@@ -387,6 +409,7 @@ public class ViewController implements Initializable {
             LOG.info(file + " wurde ausgewählt");
             this.configurationFile = file;
             this.lblFileName.setText(file.getName());
+            this.rbtnExistingConfig.setSelected(true);
         }
     }
 
