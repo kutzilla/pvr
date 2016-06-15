@@ -236,9 +236,10 @@ public class ViewController implements Initializable {
         scrollPaneSectionView.setContent(canvasGroup);
         //Statusdarstellung
         scrollPaneStateView.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        int height = iterations;
+
         //Vermeidung von Nullpointern bei zu großem Wert für die Höhe der Canvas'
-        if (height > 4000) height = 4000;
+        int height = 4000;
+
         canvasStateView.setHeight(height);
         canvasStateView.setWidth(to - from);
         scrollPaneStateView.setContent(canvasStateView);
