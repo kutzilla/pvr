@@ -379,7 +379,7 @@ public class ViewController implements Initializable {
                     if (tmp != null) {
                        writer.write(String.valueOf(tmp.getCurrentSpeed()));
                     }
-                    if(!(x == street[y].length-1)) {
+                    if(!(y == street[y].length-1)) {
                         writer.write(",");
                     }
                 }
