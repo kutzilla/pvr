@@ -56,31 +56,32 @@ public class TrackSwitchingTask extends SimulationTask {
             for (int x = lowerBorder; x <= upperBorder; x++) {
                 Vehicle tmp = street[y][x];
                 if (tmp != null) {
-                    // Prüfung der Fahrzeuge auf der eigenen Spur
-                    for (int i = 1; i <= tmp.getCurrentSpeed() + 1; i++) {
-                        tmpSectionIndex = (x + i) % street[y].length;
-                        // Blockierendes Fahrzeug befindet sich auf der eignen Spur
-                        if (street[y][tmpSectionIndex] != null) {
-                            // Reset von Wechselspur
-                            switchTrackIndex = -1;
-                            // Prüfung der Spur oberhalb
-                            if (y > 0 && isSwitchToTrackPossible(y - 1, x, tmp.getCurrentSpeed())) {
-                                LOG.debug("Die Spur " + (y - 1) + " wird auf einen Wechsel geprüft");
-                                switchTrackIndex = y - 1;
-                            }
-                            // Prüfung der Spur unterhalb und ein Wechsel
-                            // oberhalb nicht bereits möglich wäre
-                            else if (y < (street.length - 1) &&
-                                    isSwitchToTrackPossible(y + 1, x, tmp.getCurrentSpeed())) {
-                                LOG.debug("Die Spur " + (y + 1) + " wird auf einen Wechsel geprüft");
-                                switchTrackIndex = y + 1;
-                            }
+                    switchTrack = RandomProbabilityGenerator.generate(switchProbability);
+                    if (switchTrack) {
+                        // Prüfung der Fahrzeuge auf der eigenen Spur
+                        for (int i = 1; i <= tmp.getCurrentSpeed() + 1; i++) {
+                            tmpSectionIndex = (x + i) % street[y].length;
+                            // Blockierendes Fahrzeug befindet sich auf der eignen Spur
+                            if (street[y][tmpSectionIndex] != null) {
+                                // Reset von Wechselspur
+                                switchTrackIndex = -1;
+                                // Prüfung der Spur oberhalb
+                                if (y > 0 && isSwitchToTrackPossible(y - 1, x, tmp.getCurrentSpeed())) {
+                                    LOG.debug("Die Spur " + (y - 1) + " wird auf einen Wechsel geprüft");
+                                    switchTrackIndex = y - 1;
+                                }
+                                // Prüfung der Spur unterhalb und ein Wechsel
+                                // oberhalb nicht bereits möglich wäre
+                                else if (y < (street.length - 1) &&
+                                        isSwitchToTrackPossible(y + 1, x, tmp.getCurrentSpeed())) {
+                                    LOG.debug("Die Spur " + (y + 1) + " wird auf einen Wechsel geprüft");
+                                    switchTrackIndex = y + 1;
+                                }
 
-                            // Wechsel möglich
-                            if (switchTrackIndex >= 0) {
-                                switchTrack = RandomProbabilityGenerator.generate(switchProbability);
-                                // Ausführung des Wechsels
-                                if (switchTrack) {
+                                // Wechsel möglich
+                                if (switchTrackIndex >= 0) {
+                                    // Ausführung des Wechsels
+
                                     if (street[switchTrackIndex][x] != null) {
                                         LOG.error("Beim Wechsel von " + y + " auf " + switchTrackIndex + " wird ein " +
                                                 "Fahrzeug an Position " + x + " überfahren");
@@ -89,6 +90,7 @@ public class TrackSwitchingTask extends SimulationTask {
                                     street[switchTrackIndex][x] = tmp;
                                     LOG.debug(tmp + " wechselt von " + y + " auf die Spur " + switchTrackIndex);
                                     break;
+
                                 }
                             }
                         }
