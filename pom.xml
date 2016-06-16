@@ -84,7 +84,7 @@
                                 <descriptorRef>jar-with-dependencies</descriptorRef>
                             </descriptorRefs>
                             <appendAssemblyId>false</appendAssemblyId>
-                            <finalName>trafficsimulator-cli</finalName>
+                            <finalName>measurement-cli</finalName>
                         </configuration>
                     </execution>
                 </executions>
