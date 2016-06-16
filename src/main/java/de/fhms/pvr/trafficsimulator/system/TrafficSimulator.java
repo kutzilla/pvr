@@ -6,10 +6,13 @@ import de.fhms.pvr.trafficsimulator.system.task.DriveActionTask;
 import de.fhms.pvr.trafficsimulator.system.task.MovementTask;
 import de.fhms.pvr.trafficsimulator.system.task.TrackSwitchingTask;
 import de.fhms.pvr.trafficsimulator.system.util.SimulationTaskSplitter;
+import de.fhms.pvr.trafficsimulator.system.util.StreetConfigurationParser;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.SplittableRandom;
 import java.util.concurrent.*;
@@ -60,17 +63,28 @@ public class TrafficSimulator {
         this.workerAmount = builder.workerAmount;
         this.taskAmount = builder.taskAmount;
 
-
         if(builder.vehicleAmount == 0) {
             this.vehicleAmount = (int) ((double) builder.trackAmount * builder.sectionAmount * builder.vehicleDensity);
-        }else{
+        } else {
             this.vehicleAmount = builder.vehicleAmount;
         }
 
+        int sectionAmount;
         if (builder.street != null) {
             this.street = builder.street;
-        } else {
-            createRandomStreet(builder.trackAmount, builder.sectionAmount, builder.vehicleDensity);
+            sectionAmount = builder.sectionAmount;
+        } else if (builder.configurationFile != null) {
+            try {
+                this.street = StreetConfigurationParser
+                        .parseStreetConfigurationFrom(builder.configurationFile);
+                sectionAmount = this.street[0].length;
+            } catch (IOException e) {
+                throw new IllegalArgumentException(e.getMessage());
+            }
+        }
+            else {
+            sectionAmount = builder.sectionAmount;
+            createRandomStreet(builder.trackAmount, sectionAmount, builder.vehicleDensity);
         }
         this.timeMeasureController.suspend(SIGMA);
 
@@ -78,7 +92,7 @@ public class TrafficSimulator {
         // Erzeugung der ExecutorService und der einzelnen Tasks
         timeMeasureController.startOrResume(KAPPA);
         this.executorService = Executors.newFixedThreadPool(workerAmount);
-        fillTaskLists(builder.sectionAmount, builder.taskAmount);
+        fillTaskLists(sectionAmount, builder.taskAmount);
         timeMeasureController.suspend(KAPPA);
     }
 
@@ -200,6 +214,14 @@ public class TrafficSimulator {
         private int workerAmount;
 
         private int taskAmount;
+
+        private File configurationFile;
+
+        public TrafficSimulatorBuilder(File file) {
+            this.configurationFile = file;
+            this.workerAmount = 1;
+            this.taskAmount = 1;
+        }
 
         public TrafficSimulatorBuilder(Vehicle[][] street) {
             this.street = street;
