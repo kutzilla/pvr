@@ -1,6 +1,7 @@
 package de.fhms.pvr.trafficsimulator.system;
 
 import de.fhms.pvr.trafficsimulator.system.TrafficSimulator.TrafficSimulatorBuilder;
+import de.fhms.pvr.trafficsimulator.system.measure.TimeMeasureType;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -32,6 +33,7 @@ public class TrafficSimulatorTest {
 
         trafficSimulator = new TrafficSimulatorBuilder(testStreet).withFastDawdleProbability(1.0)
                 .withSlowDawdleProbability(1.0).withSwitchProbability(1.0).build();
+        trafficSimulator.getTimeMeasureController().startOrResume(TimeMeasureType.KAPPA);
         trafficSimulator.simulateDriveAction();
         assertArrayEquals(expectedStreet, trafficSimulator.getStreet());
     }
@@ -51,6 +53,7 @@ public class TrafficSimulatorTest {
         trafficSimulator = new TrafficSimulatorBuilder(testStreet).withFastDawdleProbability(1.0)
                 .withSlowDawdleProbability(1.0).withSwitchProbability(1.0)
                 .withWorkerAmount(2).withTaskAmount(2).build();
+        trafficSimulator.getTimeMeasureController().startOrResume(TimeMeasureType.KAPPA);
         trafficSimulator.simulateDriveAction();
         assertArrayEquals(expectedStreet, trafficSimulator.getStreet());
     }
@@ -70,6 +73,8 @@ public class TrafficSimulatorTest {
         trafficSimulator = new TrafficSimulatorBuilder(testStreet).withFastDawdleProbability(1.0)
                 .withSlowDawdleProbability(1.0).withSwitchProbability(1.0)
                 .withWorkerAmount(2).withTaskAmount(3).build();
+
+        trafficSimulator.getTimeMeasureController().startOrResume(TimeMeasureType.KAPPA);
         trafficSimulator.simulateDriveAction();
         assertArrayEquals(expectedStreet, trafficSimulator.getStreet());
     }
@@ -90,6 +95,7 @@ public class TrafficSimulatorTest {
         expectedStreet[0][2] = new Vehicle(3);
 
         trafficSimulator = new TrafficSimulatorBuilder(testStreet).build();
+        trafficSimulator.getTimeMeasureController().startOrResume(TimeMeasureType.KAPPA);
         trafficSimulator.simulateMovement();
         assertArrayEquals(expectedStreet, trafficSimulator.getStreet());
     }
@@ -110,6 +116,8 @@ public class TrafficSimulatorTest {
 
         trafficSimulator = new TrafficSimulatorBuilder(testStreet)
                 .withWorkerAmount(2).withTaskAmount(2).build();
+
+        trafficSimulator.getTimeMeasureController().startOrResume(TimeMeasureType.KAPPA);
         trafficSimulator.simulateMovement();
         assertArrayEquals(expectedStreet, trafficSimulator.getStreet());
     }
@@ -130,6 +138,8 @@ public class TrafficSimulatorTest {
 
         trafficSimulator = new TrafficSimulatorBuilder(testStreet)
                 .withWorkerAmount(2).withTaskAmount(3).build();
+
+        trafficSimulator.getTimeMeasureController().startOrResume(TimeMeasureType.KAPPA);
         trafficSimulator.simulateMovement();
         assertArrayEquals(expectedStreet, trafficSimulator.getStreet());
     }
