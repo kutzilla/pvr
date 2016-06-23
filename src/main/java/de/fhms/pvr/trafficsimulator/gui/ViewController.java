@@ -214,12 +214,8 @@ public class ViewController implements Initializable {
             trafficSimulator = null;
             builder = null;
             if (rbtnExistingConfig.isSelected() && configurationFile != null) {
-                try {
-                    builder = new TrafficSimulatorBuilder(StreetConfigurationParser
-                            .parseStreetConfigurationFrom(configurationFile));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                builder = new TrafficSimulatorBuilder(configurationFile);
+
             } else {
                 builder = new TrafficSimulatorBuilder(trackAmount, sectionAmount);
                 LOG.info("NEW");
